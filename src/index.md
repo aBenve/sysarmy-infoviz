@@ -19,6 +19,13 @@ from "db"
 
 ```
 
+```sql
+
+SELECT donde_estas_trabajando
+FROM "db"
+
+```
+
 
 <!-- This styles seems to be global -->
 
