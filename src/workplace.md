@@ -191,14 +191,13 @@ WITH median_salary_cte AS (
 
 SELECT 
   db.trabajo_de AS role,
-  db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary,
-  AVG(db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) OVER (PARTITION BY db.trabajo_de) AS avg_salary,
+  -- AVG(db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS avg_salary,
   median_salary_cte.median_salary
 FROM db
 JOIN median_salary_cte ON db.trabajo_de = median_salary_cte.role
 WHERE db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
-GROUP BY db.trabajo_de, db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos, median_salary_cte.median_salary
-ORDER BY salary DESC
+GROUP BY db.trabajo_de, median_salary_cte.median_salary
+ORDER BY median_salary_cte.median_salary DESC
 LIMIT 10
 
 ```
@@ -212,21 +211,10 @@ function top10RolesSalary(data, {width}) {
     width: width,
     marginLeft: 150,
     marginRight: 10,
-    color: {
-      legend: true,
-      domain: ["Average Salary", "Median Salary"],
-      range: ["red", "white"],
-      label: "Salary Type"
+    x: {
+      label: "Median Salary"
     },
     marks: [
-      Plot.barX(data, {
-        x: "avg_salary",
-        y: "role",
-        opacity: 0.7,
-        fill: "red",
-        sort: { y: "-x" },
-        tip: true
-      }),
       Plot.barX(data, {
         x: "median_salary",
         y: "role",
