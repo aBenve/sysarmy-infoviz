@@ -1,7 +1,7 @@
 ---
 title: Participant profile
 sql: 
-  db: ./data/salary-survey-2024.csv 
+  db: ./data/2024.01.csv 
 ---
 
 ```ts
