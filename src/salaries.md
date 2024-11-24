@@ -1,7 +1,7 @@
 ---
 title: Salaries
 sql: 
-  db: ./data/2024.01.csv 
+  db: ./data/2024-01.csv 
   historic: ./data/historic.csv
 ---
 

@@ -1,7 +1,7 @@
 ---
 toc: false
 sql: 
-  db: ./data/2024.01.csv 
+  db: ./data/2024-01.csv 
 ---
 
 <div class="hero">
