@@ -106,24 +106,20 @@ v <- read_csv(
     col_number(),
   )
 ) |>
-  mutate(genero = if_else(
+  mutate(genero = case_when(
     str_detect(
       genero,
       regex("^Hombre|Varón Cis|Hombre Cis|Varon|Varón|Masculino$", ignore_case = TRUE)
-    ), "Hombre Cis",
-    if_else(
-      str_detect(
-        genero,
-        regex("^Mujer|Mujer Cis$", ignore_case = TRUE)
-      ), "Mujer Cis",
-      if_else(
-        str_detect(
-          genero,
-          regex("^heterosexual|normal$", ignore_case = TRUE)
-        ), NA,
-        genero
-      )
-    )
+    ) ~ "Hombre Cis",
+    str_detect(
+      genero,
+      regex("^Mujer|Mujer Cis$", ignore_case = TRUE)
+    ) ~ "Mujer Cis",
+    str_detect(
+      genero,
+      regex("^heterosexual|normal$", ignore_case = TRUE)
+    ) ~ NA_character_,
+    TRUE ~ genero
   )) |>
   filter(!is.na(genero) & !is.na(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos))
 

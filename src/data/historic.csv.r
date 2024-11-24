@@ -2,6 +2,7 @@
 
 
 library(tidyverse)
+library(lubridate)
 
 read_semester <- function(year, semester) {
   library(readr)
@@ -213,24 +214,20 @@ v <- read_semester(2016, 1) |>
     conformidad = as.numeric(conformidad),
   ) |>
   select(-bruto, salario = neto) |>
-  mutate(genero = if_else(
+  mutate(genero = case_when(
     str_detect(
       genero,
       regex("^Hombre|Varón Cis|Hombre Cis|Varon|Varón|Masculino$", ignore_case = TRUE)
-    ), "Hombre Cis",
-    if_else(
-      str_detect(
-        genero,
-        regex("^Mujer|Mujer Cis$", ignore_case = TRUE)
-      ), "Mujer Cis",
-      if_else(
-        str_detect(
-          genero,
-          regex("^heterosexual|normal$", ignore_case = TRUE)
-        ), NA,
-        genero
-      )
-    )
+    ) ~ "Hombre Cis",
+    str_detect(
+      genero,
+      regex("^Mujer|Mujer Cis$", ignore_case = TRUE)
+    ) ~ "Mujer Cis",
+    str_detect(
+      genero,
+      regex("^heterosexual|normal$", ignore_case = TRUE)
+    ) ~ NA_character_,
+    TRUE ~ genero
   )) |>
   filter(!is.na(conformidad) & !is.na(salario) & !is.na(genero))
 
