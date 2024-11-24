@@ -1,12 +1,17 @@
 ---
-title: workplace
+title: Workplace
+theme: dashboard
+toc: false
+
 sql: 
   db: ./data/2024-01.csv 
 ---
 
+# Workplace
+
+In this section we will analyze the data related to the workplace.
 
 ### By type of contract
-
 
 ```sql id=contract_type
 
@@ -19,51 +24,69 @@ GROUP BY tipo_de_contrato
 
 ```
 
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => contractType(contract_type, {width}))}
+  </div>
+    <div class="card">
+    ${resize((width) => salaryInDollars(salary_in_dollars, {width}))}
+  </div>
+    
+<div class="card">
+    ${resize((width) => amountOfGuards(amount_of_guards, {width}))}
+  </div>   
+<div class="card">
+    ${resize((width) => top10RolesSalary(top_10_roles_salary, {width}))}
+  </div>   
+</div>
+
 ```js
 
-const contractType = Plot.plot({
-  height: 400,
-  width: 800,   
-  marginLeft: 330,
-  marginRight: 100,    
-  x: {
-    label: "Amount of participants"
-  },
-  y: {
-    label: "Contract type"
-  },
-  
-  marks: [
-    Plot.barX(contract_type, {
-        x: "percentage",
-        y: "contract_type",
-        sort: { y: "-x" },
-        tip: true
-    }),
+function contractType(data, {width}){
+  return Plot.plot({
+          title: "By type of contract",
+          height: 200,
+          width: width,   
+          marginLeft: 300,
+          marginRight: 70,
+          x: {
+            label: "Amount of participants"
+          },
+          y: {
+            label: "Contract type"
+          },
+          
+          marks: [
+            Plot.barX(data, {
+                x: "percentage",
+                y: "contract_type",
+                sort: { y: "-x" },
+                tip: true
+            }),
 
-    Plot.text(contract_type, {
-      x: "percentage",
-      y: "contract_type",
-      text: d => `${d.percentage}%`,
-      dx: 40,
-      align: "left",
-      baseline: "middle",
-      color: "black",
-      font: "Arial",
-      fontSize: 12
-    })
-  ]
-})
+            Plot.text(data, {
+              x: "percentage",
+              y: "contract_type",
+              text: d => `${d.percentage}%`,
+              dx: 40,
+              align: "left",
+              baseline: "middle",
+              color: "black",
+              font: "Arial",
+              fontSize: 12
+            })
+          ]
+        })
 
+}
 
-display(contractType)
 
 ```
 
 
-### By amount of salary in dollars
+<!-- ### By amount of salary in dollars -->
 
-```sql id=salary_in_dollars display
+```sql id=salary_in_dollars
 
 SELECT 
     COALESCE(pagos_en_dolares, 'No Dolarizado') AS salary_in_dollars, 
@@ -76,34 +99,35 @@ GROUP BY pagos_en_dolares
 
 ```js
 
-const salaryInDollars = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
-  marks: [
-  Plot.barX(salary_in_dollars, {
-    x: "percentage",
-    y: "salary_in_dollars",
-    sort: { y: "-x" },
-    tip: true
-  }),
-  Plot.text(salary_in_dollars, {
-    text: d => `${d.salary_in_dollars}: ${d.percentage}%`,
-    dy: 5,
-    dx: 5,
-    font: "Arial",
-    fontSize: 12,
-    fill: "black"
-  })
-  ]
-})
+function salaryInDollars(data, {width}) {
+    return Plot.plot({
+      height: 200,
+        title: "By amount of salary in dollars",
+      width: width,
+      marginLeft: 290,
 
-display(salaryInDollars)
+      marks: [
+      Plot.barX(salary_in_dollars, {
+        x: "percentage",
+        y: "salary_in_dollars",
+        sort: { y: "-x" },
+        tip: true
+      }),
+      Plot.text(salary_in_dollars, {
+        text: d => `${d.salary_in_dollars}: ${d.percentage}%`,
+        dy: 5,
+        dx: 5,
+        font: "Arial",
+        fontSize: 12,
+        fill: "black"
+      })
+      ]
+    })
+}
 
 ```
 
-### By amount of guards
+<!-- ### By amount of guards -->
 
 ```sql id=amount_of_guards
 
@@ -124,37 +148,37 @@ GROUP BY tenes_guardias
 
 ```js
 
-const amountOfGuards = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-  marks: [
-    Plot.barX(amount_of_guards, {
-        x: "percentage",
-        y: "amount_of_guards",
-        sort: { y: "-x" },
-      tip: true
-    }),
-    Plot.text(amount_of_guards, {
-      text: d => `${d.amount_of_guards}: ${d.percentage}%`,
-      dy: 5,
-      dx: 5,
-      font: "Arial",
-      fontSize: 12,
-      fill: "black"
+function amountOfGuards(data, {width}){
+  return  Plot.plot({
+        title: "By guards",
+      height: 200,
+      width: width,
+      marginLeft: 200,
+      marginRight: 100,
+      marks: [
+        Plot.barX(data, {
+            x: "percentage",
+            y: "amount_of_guards",
+            sort: { y: "-x" },
+          tip: true
+        }),
+        Plot.text(data, {
+          text: d => `${d.amount_of_guards}: ${d.percentage}%`,
+          dy: 5,
+          dx: 5,
+          font: "Arial",
+          fontSize: 12,
+          fill: "black"
+        })
+      ]
     })
-  ]
-})
+}
 
-display(amountOfGuards)
 
 ```
-### Top 10 best salary
+<!-- ### Top 10 best salary -->
 
-Para que este grafico sea correcto hay que limpiar los datos. Hay un muchacho/a que propone que cobra 440M de pesos.
-
-```sql id=top_10_roles_salary display
+```sql id=top_10_roles_salary
 
 WITH median_salary_cte AS (
   SELECT 
@@ -181,28 +205,58 @@ LIMIT 10
 
 ```js
 
-const top10RolesSalary = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-    
-  marks: [
-      Plot.barX(top_10_roles_salary, {
-        x: "salary",
+function top10RolesSalary(data, {width}) {
+  return Plot.plot({
+    title: "Top 10 best salary",
+    height: 200,
+    width: width,
+    marginLeft: 150,
+    marginRight: 10,
+    color: {
+      legend: true,
+      domain: ["Average Salary", "Median Salary"],
+      range: ["red", "white"],
+      label: "Salary Type"
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "avg_salary",
         y: "role",
+        opacity: 0.7,
+        fill: "red",
         sort: { y: "-x" },
         tip: true
       }),
-  ]
-})
+      Plot.barX(data, {
+        x: "median_salary",
+        y: "role",
+        fill: "white",
+        opacity: 0.7,
+        sort: { y: "-x" },
+        tip: true
+      })
+    ]
+  });
+}
 
-display(top10RolesSalary)
 
 ```
 
 
-### By bonus
+### By compensation
+This section will analyze the data related to compensation, like bonuses and benefits.
+
+
+
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => bonus(by_bonus, {width}))}
+  </div>
+    <div class="card">
+    ${resize((width) => benefits(by_benefits, {width}))}
+  </div>
+      
+</div>
 
 ```sql id=by_bonus
 
@@ -217,11 +271,11 @@ GROUP BY recibis_algun_tipo_de_bono
 
 ```js
 
-const bonus = Plot.plot({
+function bonus(data, {width}) {return Plot.plot({
+  title: "By bonus",
   height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
+  width: width,
+  marginLeft: 150,
   marks: [
       Plot.barX(by_bonus, {
           x: "percentage",
@@ -230,13 +284,11 @@ const bonus = Plot.plot({
           tip: true
       })
   ]
-})
-
-display(bonus)
+})}
 
 ```
 
-### By benefits
+<!-- ### By benefits -->
 
 ```sql id=by_benefits 
 
@@ -257,18 +309,19 @@ aggregated_benefits AS (
 )
 SELECT *
 FROM aggregated_benefits
-WHERE total_count > 60
+WHERE total_count > 60 AND benefit != 'etc)' AND benefit != 'ualá)'
 ORDER BY percentage DESC;
 
 ```
 
 ```js
 
-const benefits = Plot.plot({
+function benefits(data, {width}){ return Plot.plot({
+  title: "By benefits",
   height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
+  width: width,
+  marginLeft: 300,
+
   marks: [
       Plot.barX(by_benefits, {
           x: "percentage",
@@ -277,13 +330,27 @@ const benefits = Plot.plot({
           tip: true
       })
   ]
-})
-
-display(benefits)
+})}
 
 ```
 
-### By amount of employees
+### By company 
+
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => amountOfEmployees(amount_of_employees, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => workModalities(work_modalities, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => happinessInWorkplace(happiness_in_workplace, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => discomfortInWorkplace(discomfort_in_workplace, {width}))}
+  </div>
+      
+</div>
 
 ```sql id=amount_of_employees
 
@@ -298,26 +365,25 @@ GROUP BY cantidad_de_personas_en_tu_organizacion
 
 ```js
 
-const amountOfEmployees = Plot.plot({
+function amountOfEmployees (data, {width}) { return Plot.plot({
+  title: "By amount of employees",
   height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
+  width: width,
+  marginLeft: 180,
+
   marks: [
-      Plot.barX(amount_of_employees, {
+      Plot.barX(data, {
           x: "percentage",
           y: "amount_of_employees",
           sort: { y: "-x" },
           tip: true
       })
   ]
-})
-
-display(amountOfEmployees)
+})}
 
 ```
 
-### By work modalities
+<!-- ### By work modalities -->
 
 ```sql id=work_modalities
 
@@ -332,28 +398,27 @@ GROUP BY modalidad_de_trabajo
 
 ```js
 
-const workModalities = Plot.plot({
+function workModalities(data, {width}) {return  Plot.plot({
+  title: "By work modalities",
   height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
+  width: width,
+
+
   marks: [
-      Plot.barX(work_modalities, {
-          x: "percentage",
-          y: "work_modalities",
-          sort: { y: "-x" },
+      Plot.barY(data, {
+          y: "percentage",
+          x: "work_modalities",
+          sort: { x: "-y" },
           tip: true
       }),
   ]
-})
-
-display(workModalities)
+})}
 
 ```
 
-### By happiness in the workplace
+<!-- ### By happiness in the workplace -->
 
-```sql id=happiness_in_workplace display
+```sql id=happiness_in_workplace 
 
 SELECT 
   CASE 
@@ -371,26 +436,32 @@ GROUP BY happiness_in_workplace
 
 ```js
 
-const happinessInWorkplace = Plot.plot({
+function happinessInWorkplace(data, {width})  {return Plot.plot({
+  title: "By happiness in the workplace",
   height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
+  width: width,
+
+    x: {
+      label: "Different levels of happiness"
+    },
+
+    y: {
+      label: "Amount of participants"
+    },
+    
   marks: [
-      Plot.barX(happiness_in_workplace, {
-          x: "percentage",
-          y: "happiness_in_workplace",
-          sort: { y: "-x" },
+      Plot.barY(data, {
+          y: "percentage",
+          x: "happiness_in_workplace",
+          sort: { x: "-y" },
           tip: true
       })
   ]
-})
-
-display(happinessInWorkplace)
+})}
 
 ```
 
-### By discomfort in the workplace
+<!-- ### By discomfort in the workplace -->
 
 ```sql id=discomfort_in_workplace
 
@@ -405,21 +476,26 @@ GROUP BY discomfort_in_workplace
 
 ```js
 
-const discomfortInWorkplace = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 320,
-  marginRight: 100,
+function discomfortInWorkplace(data, {width}) {return Plot.plot({
+  title: "By discomfort in the workplace",
+  width: width,
+    
+    x: {
+      label: "Different levels of discomfort"
+    },
+
+    y: {
+      label: "Amount of participants"
+    },
+
   marks: [
-      Plot.barX(discomfort_in_workplace, {
-          x: "percentage",
-          y: "discomfort_in_workplace",
-          sort: { y: "-x" },
+      Plot.barY(data, {
+          y: "percentage",
+          x: "discomfort_in_workplace",
+          sort: { x: "-y" },
           tip: true
       }),
   ]
-})
-
-display(discomfortInWorkplace)
+})}
 
 ```
