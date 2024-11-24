@@ -4,6 +4,10 @@ sql:
   db: ./data/salary-survey-2024.csv 
 ---
 
+```ts
+import type * as PlotType from "@observablehq/plot";
+let PlotTyped: typeof PlotType = Plot;
+```
 
 ### From where are the participants?
 
@@ -16,9 +20,8 @@ GROUP BY donde_estas_trabajando
 
 ```
 
-```js 
-
-const salaryDistribution = Plot.plot({
+```ts 
+const salaryDistribution = PlotTyped.plot({
   height: 600,
   width: 800,   
   marginLeft: 200,
@@ -30,8 +33,8 @@ const salaryDistribution = Plot.plot({
     label: "Region"
   },
   marks: [
-    Plot.barX(percentage_per_region, {x: "percentage", y: "region", sort: {y: "-x"}, tip: d => `Total count: ${d.total_count}`}),
-    Plot.text(percentage_per_region, {x: "percentage", y: "region", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
+    PlotTyped.barX(percentage_per_region, {x: "percentage", y: "region", sort: {y: "-x"}, tip: true, title: (d: any) => `Total count: ${d.total_count}`}),
+    PlotTyped.text(percentage_per_region, {x: "percentage", y: "region", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
 
@@ -94,7 +97,7 @@ const roleDistribution = Plot.plot({
 
   },
   marks: [
-    Plot.barX(roles, {x: "percentage", y: "role", tip: d => `Total count: ${d.total_count}`, fill: (d) => d.role === "Other" ? "yellow" : "purple"}),
+    Plot.barX(roles, {x: "percentage", y: "role", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.role === "Other" ? "yellow" : "purple"}),
     Plot.text(roles, {x: "percentage", y: "role", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
@@ -334,7 +337,7 @@ const careerPathsDistribution = Plot.plot({
 
   },
   marks: [
-    Plot.barX(career_paths, {x: "percentage", y: "career_path", tip: d => `Total count: ${d.total_count}`, fill: (d) => d.career_path === "Other" ? "yellow" : "purple"}),
+    Plot.barX(career_paths, {x: "percentage", y: "career_path", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.career_path === "Other" ? "yellow" : "purple"}),
     Plot.text(career_paths, {x: "percentage", y: "career_path", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
@@ -399,7 +402,7 @@ const universitiesDistribution = Plot.plot({
 
   },
   marks: [
-    Plot.barX(universities, {x: "percentage", y: "university", tip: d => `Total count: ${d.total_count}`, fill: (d) => d.university === "Other" ? "yellow" : "purple"}),
+    Plot.barX(universities, {x: "percentage", y: "university", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.university === "Other" ? "yellow" : "purple"}),
     Plot.text(universities, {x: "percentage", y: "university", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })

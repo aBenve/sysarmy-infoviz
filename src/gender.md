@@ -42,7 +42,7 @@ const salaryDistribution = Plot.plot({
     label: "Region"
   },
   marks: [
-    Plot.barX(gender_identity, {x: "percentage", y: "gender", sort: {y: "-x"}, tip: d => `Total count: ${d.total_count}`}),
+    Plot.barX(gender_identity, {x: "percentage", y: "gender", sort: {y: "-x"}, tip: true, title: d => `Total count: ${d.total_count}`}),
     Plot.text(gender_identity, {x: "percentage", y: "gender", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
@@ -166,7 +166,7 @@ const studiesCompletionChart = Plot.plot({
       fy: "gender",
       fill: "education_status",
       sort: { y: "-x" },
-      tip: d => `Total count: ${d.total_count}`
+      tip: true, title: d => `Total count: ${d.total_count}`
     }),
   ]
 })
@@ -221,7 +221,7 @@ const studiesLineChart = Plot.plot({
   marks: [
     Plot.line(studies, {x: "experience", y: "average_salary", 
 stroke: "gender", curve: "natural"}),
-    Plot.dot(studies, {x: "experience", y: "average_salary", fill: "gender", r: 5, tip: d => `Average Salary: ${d.average_salary}`})
+    Plot.dot(studies, {x: "experience", y: "average_salary", fill: "gender", r: 5, tip: true, title: d => `Average Salary: ${d.average_salary}`})
   ]
 })
 
