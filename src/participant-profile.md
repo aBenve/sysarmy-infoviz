@@ -5,7 +5,7 @@ sql:
 ---
 
 
-## From where are the participants?
+### From where are the participants?
 
 
 ```sql id=percentage_per_region 

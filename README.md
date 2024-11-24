@@ -51,3 +51,56 @@ A typical Framework project looks like this:
 | `npm run deploy`     | Deploy your app to Observable                            |
 | `npm run clean`      | Clear the local data loader cache                        |
 | `npm run observable` | Run commands like `observable help`                      |
+
+
+## Graficos a realizar
+
+1. Perfil de los participantes:
+    1. por provincia y CABA
+    2. por rol 
+    3. por experiencia (0-1, 2, 3, 4-5, 6-8, 9-13, 14-21, 22-43)
+        4. por anios en la compania actual
+        5. por anios en el puesto actual
+    6. por nivel educativo (stackeado por completo, en curso, incompleto)
+        7. por carrera estudiada
+        8. por universidad
+    7. por demografia - genero
+2. Salarios
+    1. historico en varias monedas
+    2. segun contrato dolarizados vs en pesos agrupado por junior, semi-senior o senior
+    3. segun puesto agrupado por junior, semi-senior o senior
+    4. segun educacion agrupado por dolarizado o no
+    5. segun carrera y experiencia (agrupado por junior, semi-senior o senior)
+    6. segun tecnologias usadas agrupado por junior, semi-senior o senior
+    7. segun lenguajes usados agrupado por junior, semi-senior o senior
+3. Genero (hombre, mujer y otroa)
+    1. cantidad 
+    2. salarios
+    3. historico de participacion
+    4. historico salarios
+    5. historico de conformidad
+    6. formacion 
+    7. experiencia
+    8. conformidad
+    9. salario ajustado por inflacion (raro este)
+    10. posicion de liderazgo
+4. Tecnologias
+    1. plataformas que usan
+    2. lenguajes de programacion
+    3. frameworks, herramientas y librerias
+    4. bases de datos
+    5. QA/testing
+    6. que tanto usan IA? del 0 al 5
+5. Trabajo
+    1. tipo de contrato
+    2. porcentaje del sueldo dolarizado (no dolarizado, 100%, parcialmente, dolarizado pero??)
+    3. realiza guardias ? (sin, guardias activas, guardias pasivas)
+    4. tipo de contrato y sus sueldos mezclado con el porcentaje dolarizado
+    5. Compensaciones. hay bono? 
+    6. hay beneficios extra?
+    7. porcentaje de ajuste por inflacion
+    8. caracteristicas de la empresa - cantidad de gente
+    9. modalidad de trabajo - remoto, presencial o hibrido
+    10. recomiendan el lugar? promotores, pasivos, detractores
+    11. buscan cambiar de lugar? escuchando propuestas, no busca o en busqueda activa
+

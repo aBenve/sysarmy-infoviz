@@ -373,7 +373,7 @@ const salaryPerTechnologyExperience = Plot.plot({
   legend: true,
   label: "Seniority",
   domain: ["Junior", "Semi-Senior", "Senior"],
-  scheme: "tableau10",
+  scheme: "Observable10",
   },
   marks: [
   Plot.barX(salary_per_technology_experience, {
