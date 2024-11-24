@@ -138,29 +138,6 @@ WITH categorized_salaries AS (
         AND trabajo_de IS NOT NULL
 ),
 
-percentiles AS (
-    SELECT 
-        seniority,
-        job_title,
-        PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY salary) AS q1,
-        PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY salary) AS q3
-    FROM categorized_salaries
-    GROUP BY seniority, job_title
-),
-
-iqr_filtered AS (
-    SELECT 
-        c.seniority,
-        c.job_title,
-        c.salary,
-        p.q1,
-        p.q3,
-        p.q3 - p.q1 AS iqr
-    FROM categorized_salaries c
-    INNER JOIN percentiles p
-        ON c.seniority = p.seniority AND c.job_title = p.job_title
-    WHERE c.salary BETWEEN (p.q1 - 3.5 * (p.q3 - p.q1)) AND (p.q3 + 3.5 * (p.q3 - p.q1))
-),
 
 ranked_salaries AS (
     SELECT 
@@ -169,7 +146,7 @@ ranked_salaries AS (
         salary,
         ROW_NUMBER() OVER (PARTITION BY seniority, job_title ORDER BY salary) AS row_num,
         COUNT(*) OVER (PARTITION BY seniority, job_title) AS total_count
-    FROM iqr_filtered
+    FROM categorized_salaries
 )
 
 SELECT 
@@ -178,7 +155,7 @@ SELECT
     AVG(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
-    row_num IN ((total_count + 1) / 2, (total_count + 2) / 2)
+    total_count > 10
 GROUP BY seniority, job_title
 ORDER BY seniority, job_title;
 
@@ -189,32 +166,36 @@ ORDER BY seniority, job_title;
 const salaryPerJobTitle = Plot.plot({
   height: 1000,
   width: 1000,
-  marginLeft: 350,
   marginBottom: 100,
-  marginRight: 50,
+  marginRight: 300,
+  grid: true,
 
-  x: {
+  fy: {
     label: "Job Title",
   },
   y: {
+    label: null,
+  },
+  x: {
     label: "Median Salary",
-    grid: true,
   },
   color: {
     legend: true,
     label: "Seniority",
     domain: ["Junior", "Semi-Senior", "Senior"],
-    scheme: "tableau10",
+    scheme: "observable10",
   },
   marks: [
     Plot.barX(salary_per_job_title, {
-      y: "job_title",
+      y: "seniority",
       x: "median_salary", 
+      fy: "job_title",
       fill: "seniority",
       title: (d) => `${d.seniority}: ${d.median_salary}`,
       sort: { y: "-x",  },
         tip: true
     }),
+    Plot.axisY({ticks: []}),
   ],
 });
 
@@ -249,11 +230,11 @@ ranked_salaries AS (
 SELECT 
   education_level,
   salary_type,
-  AVG(salary) AS median_salary
+  AVG(salary) AS median_salary,
+  total_count
 FROM ranked_salaries
-WHERE 
-  row_num IN ((total_count + 1) / 2, (total_count + 2) / 2)
-GROUP BY education_level, salary_type
+WHERE total_count > 20
+GROUP BY education_level, salary_type, total_count
 ORDER BY education_level, salary_type;
 ```
 
@@ -261,8 +242,9 @@ ORDER BY education_level, salary_type;
 const salaryPerEducationContract = Plot.plot({
   height: 400,
   width: 800,
-  marginLeft: 100,
+  marginLeft: 200,
   marginRight: 100,
+  grid: true,
 
   x: {
   label: "Salary",
@@ -280,7 +262,7 @@ const salaryPerEducationContract = Plot.plot({
     x: "median_salary", 
     y: "education_level", 
     fy: "salary_type",
-    fill: "salary_type",
+    // fill: "salary_type",
     tip: true
   }),
   ]
@@ -318,41 +300,45 @@ SELECT
   AVG(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
-  row_num IN ((total_count + 1) / 2, (total_count + 2) / 2)
+    total_count > 10
 GROUP BY seniority, career
 ORDER BY seniority, career;
 ```
 
 ```js
 const salaryPerCareerExperience = Plot.plot({
-  height: 2600,
+  height: 1000,
   width: 1000,
-  marginLeft: 350,
   marginBottom: 100,
-  marginRight: 50,
+  marginRight: 300,
+  grid: true,
 
   x: {
-  label: "Career",
+    label: "Median Salary",
   },
   y: {
-  label: "Median Salary",
-  grid: true,
+    label: null
+  },
+  fy: {
+    label: "Career",
   },
   color: {
-  legend: true,
-  label: "Seniority",
-  domain: ["Junior", "Semi-Senior", "Senior"],
-  scheme: "tableau10",
+    legend: true,
+    label: "Seniority",
+    domain: ["Junior", "Semi-Senior", "Senior"],
+    scheme: "observable10",
   },
   marks: [
-  Plot.barX(salary_per_career_experience, {
-    y: "career",
-    x: "median_salary", 
-    fill: "seniority",
-    title: (d) => `${d.seniority}: ${d.median_salary}`,
-    sort: { y: "-x" },
-    tip: true
-  }),
+    Plot.barX(salary_per_career_experience, {
+      y: "seniority",
+      fy: "career",
+      x: "median_salary", 
+      fill: "seniority",
+      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      sort: { y: "-x" },
+      tip: true
+    }),
+    Plot.axisY({ticks: []}),
   ],
 });
 
@@ -388,7 +374,7 @@ SELECT
   AVG(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
-  row_num IN ((total_count + 1) / 2, (total_count + 2) / 2)
+    total_count > 10
 GROUP BY seniority, technology
 ORDER BY seniority, technology;
 
@@ -396,34 +382,39 @@ ORDER BY seniority, technology;
 
 ```js
 const salaryPerTechnologyExperience = Plot.plot({
-  height: 7000,
+  height: 1000,
   width: 1000,
-  marginLeft: 350,
+  // marginLeft: 350,
   marginBottom: 100,
-  marginRight: 50,
+  marginRight: 100,
+  grid: true,
 
   x: {
-  label: "Technology",
+    label: "Median Salary",
   },
   y: {
-  label: "Median Salary",
-  grid: true,
+    label: null,
+  },
+  fy: {
+    label: "Technology",
   },
   color: {
-  legend: true,
-  label: "Seniority",
-  domain: ["Junior", "Semi-Senior", "Senior"],
-  scheme: "Observable10",
+    legend: true,
+    label: "Seniority",
+    domain: ["Junior", "Semi-Senior", "Senior"],
+    scheme: "Observable10",
   },
   marks: [
-  Plot.barX(salary_per_technology_experience, {
-    y: "technology",
-    x: "median_salary", 
-    fill: "seniority",
-    title: (d) => `${d.seniority}: ${d.median_salary}`,
-    sort: { y: "-x" },
-    tip: true
-  }),
+    Plot.barX(salary_per_technology_experience, {
+      y: "seniority",
+      fy: "technology",
+      x: "median_salary", 
+      fill: "seniority",
+      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      sort: { y: "-x" },
+      tip: true
+    }),
+    Plot.axisY({ticks: []}),
   ],
 });
 
@@ -459,7 +450,7 @@ SELECT
   AVG(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
-  row_num IN ((total_count + 1) / 2, (total_count + 2) / 2)
+    total_count > 10
 GROUP BY seniority, programming_language
 ORDER BY seniority, programming_language;
 
@@ -467,34 +458,39 @@ ORDER BY seniority, programming_language;
 
 ```js
 const salaryPerLanguageExperience = Plot.plot({
-  height: 4000,
+  height: 1000,
   width: 1000,
-  marginLeft: 350,
+  //marginLeft: 350,
   marginBottom: 100,
-  marginRight: 50,
+  marginRight: 150,
+  grid: true,
 
   x: {
-  label: "Programming Language",
+    label: "Median Salary",
   },
   y: {
-  label: "Median Salary",
-  grid: true,
+    label: null,
+  },
+  fy: {
+    label: "Programming Language",
   },
   color: {
-  legend: true,
-  label: "Seniority",
-  domain: ["Junior", "Semi-Senior", "Senior"],
-  scheme: "tableau10",
+    legend: true,
+    label: "Seniority",
+    domain: ["Junior", "Semi-Senior", "Senior"],
+    scheme: "observable10",
   },
   marks: [
-  Plot.barX(salary_per_language_experience, {
-    y: "programming_language",
-    x: "median_salary", 
-    fill: "seniority",
-    title: (d) => `${d.seniority}: ${d.median_salary}`,
-    sort: { y: "-x" },
-    tip: true
-  }),
+    Plot.barX(salary_per_language_experience, {
+      y: "seniority",
+      fy: "programming_language",
+      x: "median_salary", 
+      fill: "seniority",
+      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      sort: { y: "-x" },
+      tip: true
+    }),
+    Plot.axisY({ticks: []}),
   ],
 });
 
