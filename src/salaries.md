@@ -6,10 +6,8 @@ sql:
 ---
 
 ### Median Salaries
-TODO
 
-### By contract type and experience
-This explains the difference in salaries if it is in dollars or pesos, and the difference in salaries in relation with the experience.
+TODO: change average for median
 
 ```sql id=salary_per_semester
 
@@ -22,7 +20,7 @@ GROUP BY date;
 ```
 
 ```js
-console.log(salary_per_semester)
+let salaryPerSemesterFixed = Array.from(salary_per_semester).map(o => ({date: new Date(o.date), mean_salary: o.mean_salary}))
 const salaryBySemester = Plot.plot({
   height: 400,
   width: 800,
@@ -37,7 +35,7 @@ const salaryBySemester = Plot.plot({
   },
 
   marks: [
-    Plot.line(salary_per_semester, {
+    Plot.line(salaryPerSemesterFixed, {
       x: "date", 
       y: "mean_salary", 
       tip: true
@@ -48,6 +46,9 @@ const salaryBySemester = Plot.plot({
 
 display(salaryBySemester);
 ```
+
+### By contract type and experience
+This explains the difference in salaries if it is in dollars or pesos, and the difference in salaries in relation with the experience.
 
 ```sql id=salary_per_contract
 
