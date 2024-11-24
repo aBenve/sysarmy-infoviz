@@ -2,6 +2,7 @@
 title: Salaries
 sql: 
   db: ./data/2024.01.csv 
+  historic: ./data/historic.csv
 ---
 
 ### Median Salaries
@@ -9,6 +10,44 @@ TODO
 
 ### By contract type and experience
 This explains the difference in salaries if it is in dollars or pesos, and the difference in salaries in relation with the experience.
+
+```sql id=salary_per_semester
+
+SELECT 
+    AVG(salario) AS mean_salary,
+    fecha AS date
+FROM historic
+GROUP BY date;
+
+```
+
+```js
+console.log(salary_per_semester)
+const salaryBySemester = Plot.plot({
+  height: 400,
+  width: 800,
+  marginLeft: 100,
+  marginRight: 100,
+
+  x: {
+    label: "Date",
+  },
+  y: {
+    label: "Salary",
+  },
+
+  marks: [
+    Plot.line(salary_per_semester, {
+      x: "date", 
+      y: "mean_salary", 
+      tip: true
+    }),
+  ]
+});
+
+
+display(salaryBySemester);
+```
 
 ```sql id=salary_per_contract
 
