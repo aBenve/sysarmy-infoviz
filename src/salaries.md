@@ -16,7 +16,6 @@ var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
 This is the important part of the survey, the salaries. We will analyze the salaries by semester, by contract type, by job title, by education level, by career, by technology experience, and by language experience.
 
-
 <div class="grid grid-cols-2">
     <div class="card">
         ${resize((width) => salaryBySemester(salary_per_semester, {width}))}
@@ -66,7 +65,6 @@ function salaryBySemester(data, { width }) {
     height: 400,
     width: width,
     marginLeft: 100,
-
 
     grid: true,
 
@@ -142,7 +140,7 @@ function salaryPerContract(data, { width }) {
 
     grid: true,
 
-    color: {    
+    color: {
       legend: true,
       label: "Salary type",
       domain: ["Junior", "Semi-Senior", "Senior"],
@@ -152,6 +150,7 @@ function salaryPerContract(data, { width }) {
     x: {
       label: "Salary",
       tickFormat: apesos,
+      ticks: 4,
     },
     y: {
       label: "Contract type",
@@ -167,6 +166,80 @@ function salaryPerContract(data, { width }) {
         y: "salary_type",
         fy: "seniority",
         fill: "seniority",
+        tip: {
+          format: {
+            x: apesos,
+          },
+        },
+      }),
+    ],
+  });
+}
+```
+
+```sql id=salary_per_education_contract
+WITH categorized_salaries AS (
+  SELECT
+    maximo_nivel_de_estudios AS education_level,
+    CASE
+      WHEN si_tu_sueldo_esta_dolarizado_cual_fue_el_ultimo_valor_del_dolar_que_tomaron IS NOT NULL THEN 'dolarized'
+      ELSE 'not dolarized'
+    END AS salary_type,
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
+  FROM "db"
+  WHERE
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
+    AND maximo_nivel_de_estudios IS NOT NULL
+),
+ranked_salaries AS (
+  SELECT
+    education_level,
+    salary_type,
+    salary,
+    ROW_NUMBER() OVER (PARTITION BY education_level, salary_type ORDER BY salary) AS row_num,
+    COUNT(*) OVER (PARTITION BY education_level, salary_type) AS total_count
+  FROM categorized_salaries
+)
+SELECT
+  education_level,
+  salary_type,
+  median(salary) AS median_salary,
+  total_count
+FROM ranked_salaries
+WHERE total_count > 20
+GROUP BY education_level, salary_type, total_count
+ORDER BY education_level, salary_type;
+```
+
+```js
+function salaryPerEducationContract(data, { width }) {
+  return Plot.plot({
+    title: "By education and contract type",
+    height: 400,
+    width: width,
+    marginLeft: 200,
+    marginRight: 100,
+    grid: true,
+
+    x: {
+      label: "Salary",
+      tickFormat: apesos,
+      ticks: 6,
+    },
+    y: {
+      label: "Education Level",
+    },
+
+    fy: {
+      label: "Salary type",
+      domain: ["dolarized", "not dolarized"],
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "median_salary",
+        y: "education_level",
+        fy: "salary_type",
+        // fill: "salary_type",
         tip: {
           format: {
             x: apesos,
@@ -221,7 +294,7 @@ function salaryPerJobTitle(data, { width }) {
     height: 1000,
     width: width,
     marginBottom: 100,
-    marginRight: 300,
+    marginRight: 150,
     grid: true,
 
     fy: {
@@ -233,6 +306,7 @@ function salaryPerJobTitle(data, { width }) {
     x: {
       label: "Median Salary",
       tickFormat: apesos,
+      ticks: 4,
     },
     color: {
       legend: true,
@@ -251,79 +325,6 @@ function salaryPerJobTitle(data, { width }) {
         tip: true,
       }),
       Plot.axisY({ ticks: [] }),
-    ],
-  });
-}
-```
-
-```sql id=salary_per_education_contract
-WITH categorized_salaries AS (
-  SELECT
-    maximo_nivel_de_estudios AS education_level,
-    CASE
-      WHEN si_tu_sueldo_esta_dolarizado_cual_fue_el_ultimo_valor_del_dolar_que_tomaron IS NOT NULL THEN 'dolarized'
-      ELSE 'not dolarized'
-    END AS salary_type,
-    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
-  FROM "db"
-  WHERE
-    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
-    AND maximo_nivel_de_estudios IS NOT NULL
-),
-ranked_salaries AS (
-  SELECT
-    education_level,
-    salary_type,
-    salary,
-    ROW_NUMBER() OVER (PARTITION BY education_level, salary_type ORDER BY salary) AS row_num,
-    COUNT(*) OVER (PARTITION BY education_level, salary_type) AS total_count
-  FROM categorized_salaries
-)
-SELECT
-  education_level,
-  salary_type,
-  median(salary) AS median_salary,
-  total_count
-FROM ranked_salaries
-WHERE total_count > 20
-GROUP BY education_level, salary_type, total_count
-ORDER BY education_level, salary_type;
-```
-
-```js
-function salaryPerEducationContract(data, { width }) {
-  return Plot.plot({
-    title: "By education and contract type",
-    height: 400,
-    width: width,
-    marginLeft: 200,
-    marginRight: 100,
-    grid: true,
-
-    x: {
-      label: "Salary",
-      tickFormat: apesos,
-    },
-    y: {
-      label: "Education Level",
-    },
-
-    fy: {
-      label: "Salary type",
-      domain: ["dolarized", "not dolarized"],
-    },
-    marks: [
-      Plot.barX(data, {
-        x: "median_salary",
-        y: "education_level",
-        fy: "salary_type",
-        // fill: "salary_type",
-        tip: {
-          format: {
-            x: apesos,
-          },
-        },
-      }),
     ],
   });
 }
@@ -368,12 +369,13 @@ function salaryPerCareerExperience(data, { width }) {
     height: 1000,
     width: width,
     marginBottom: 100,
-    marginRight: 300,
+    marginRight: 200,
     grid: true,
 
     x: {
       label: "Median Salary",
       tickFormat: apesos,
+      ticks: 4,
     },
     y: {
       label: null,
@@ -444,13 +446,13 @@ function salaryPerTechnologyExperience(data, { width }) {
     width: width,
     // marginLeft: 350,
     marginBottom: 100,
-    marginRight: 100,
+    marginRight: 150,
     grid: true,
 
     x: {
       label: "Median Salary",
       tickFormat: apesos,
-      ticks: 5,
+      ticks: 4,
     },
     y: {
       label: null,
@@ -527,6 +529,7 @@ function salaryPerLanguageExperience(data, { width }) {
     x: {
       label: "Median Salary",
       tickFormat: apesos,
+      ticks: 4,
     },
     y: {
       label: null,
