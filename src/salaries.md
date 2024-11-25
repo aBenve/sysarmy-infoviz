@@ -12,6 +12,11 @@ sql:
 var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 ```
 
+# Salaries
+
+This is the important part of the survey, the salaries. We will analyze the salaries by semester, by contract type, by job title, by education level, by career, by technology experience, and by language experience.
+
+
 <div class="grid grid-cols-2">
     <div class="card">
         ${resize((width) => salaryBySemester(salary_per_semester, {width}))}
@@ -61,7 +66,9 @@ function salaryBySemester(data, { width }) {
     height: 400,
     width: width,
     marginLeft: 100,
-    marginRight: 100,
+
+
+    grid: true,
 
     x: {
       label: "Date",
@@ -132,6 +139,15 @@ function salaryPerContract(data, { width }) {
     width: width,
     marginLeft: 100,
     marginRight: 100,
+
+    grid: true,
+
+    color: {    
+      legend: true,
+      label: "Salary type",
+      domain: ["Junior", "Semi-Senior", "Senior"],
+      scheme: "observable10",
+    },
 
     x: {
       label: "Salary",
