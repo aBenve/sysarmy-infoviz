@@ -1,5 +1,8 @@
 ---
 title: Participant profile
+theme: dashboard
+toc: false
+
 sql:
   db: ./data/2024-01.csv
 ---
@@ -9,7 +12,38 @@ import type * as PlotType from "@observablehq/plot";
 let PlotTyped: typeof PlotType = Plot;
 ```
 
-### From where are the participants?
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => salaryDistribution(percentage_per_region, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => roleDistribution(roles, {width}))}
+  </div>
+</div>
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => experienceDistribution(experience, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => yearsInCompanyDistribution(years_in_company, {width}))}
+  </div>
+</div>
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => educationLevelDistribution(education_level, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => careerPathsDistribution(career_paths, {width}))}
+  </div>
+</div>
+<div class="grid grid-cols-2">
+  <div class="card">
+    ${resize((width) => universitiesDistribution(universities, {width}))}
+  </div>
+  <div class="card">
+    ${resize((width) => genderDistribution(gender, {width}))}
+  </div>
+</div>
 
 ```sql id=percentage_per_region
 
@@ -20,36 +54,37 @@ GROUP BY donde_estas_trabajando
 ```
 
 ```ts
-const salaryDistribution = PlotTyped.plot({
-  height: 600,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-  x: {
-    label: "Amount of participants",
-  },
-  y: {
-    label: "Region",
-  },
-  marks: [
-    PlotTyped.barX(percentage_per_region, {
-      x: "percentage",
-      y: "region",
-      sort: { y: "-x" },
-      tip: true,
-      title: (d: any) => `Total count: ${d.total_count}`,
-    }),
-    PlotTyped.text(percentage_per_region, {
-      x: "percentage",
-      y: "region",
-      text: (d) => `${d.percentage.toFixed(2)} %`,
-      dx: 30,
-      textAnchor: "middle",
-    }),
-  ],
-});
-
-display(salaryDistribution);
+function salaryDistribution(data, { width }) {
+  return Plot.plot({
+    title: "From where are the participants?",
+    height: 600,
+    width: width,
+    marginLeft: 200,
+    marginRight: 100,
+    x: {
+      label: "Amount of participants",
+    },
+    y: {
+      label: "Region",
+    },
+    marks: [
+      PlotTyped.barX(data, {
+        x: "percentage",
+        y: "region",
+        sort: { y: "-x" },
+        tip: true,
+        title: (d: any) => `Total count: ${d.total_count}`,
+      }),
+      PlotTyped.text(data, {
+        x: "percentage",
+        y: "region",
+        text: (d) => `${d.percentage.toFixed(2)} %`,
+        dx: 30,
+        textAnchor: "middle",
+      }),
+    ],
+  });
+}
 ```
 
 <!-- ```js
@@ -57,8 +92,6 @@ display(salaryDistribution);
 const seeAll = view(Inputs.checkbox(["seeAll"], {label: "See all data"}))
 
 ``` -->
-
-### By role
 
 ```sql id=roles
 WITH role_data AS (
@@ -83,48 +116,47 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEnd = Array.from(roles).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.role === "Other") return 1;
-  if (b.role === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function roleDistribution(data, { width }) {
+  const sortOtherToEnd = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.role === "Other") return 1;
+    if (b.role === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const roleDistribution = Plot.plot({
-  height: 600,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Role",
-    domain: sortOtherToEnd.map((d) => d.role), // Use sorted order for roles
-  },
-  marks: [
-    Plot.barX(roles, {
-      x: "percentage",
-      y: "role",
-      tip: true,
-      title: (d) => `Total count: ${d.total_count}`,
-      fill: (d) => (d.role === "Other" ? "#EFB118" : "#4269D0"),
-    }),
-    Plot.text(roles, {
-      x: "percentage",
-      y: "role",
-      text: (d) => `${d.percentage.toFixed(2)} %`,
-      dx: 30,
-      textAnchor: "middle",
-    }),
-  ],
-});
-
-display(roleDistribution);
+  return Plot.plot({
+    title: "By role",
+    height: 600,
+    width: width,
+    marginLeft: 200,
+    marginRight: 100,
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Role",
+      domain: sortOtherToEnd.map((d) => d.role), // Use sorted order for roles
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "role",
+        tip: true,
+        title: (d) => `Total count: ${d.total_count}`,
+        fill: (d) => (d.role === "Other" ? "#EFB118" : "#4269D0"),
+      }),
+      Plot.text(data, {
+        x: "percentage",
+        y: "role",
+        text: (d) => `${d.percentage.toFixed(2)} %`,
+        dx: 30,
+        textAnchor: "middle",
+      }),
+    ],
+  });
+}
 ```
-
-### By experience
 
 ```sql id=experience
 
@@ -148,50 +180,47 @@ ORDER BY experience_interval
 
 ```js
 // Create a grouped histogram
-const experienceDistribution = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-  x: {
-    label: "Percentage of Participants",
-  },
-  y: {
-    label: "Experience Interval (years)",
-    domain: [
-      "< 1 year",
-      "1-3 years",
-      "4-6 years",
-      "7-10 years",
-      "10-15 years",
-      "15-20 years",
-      "20-25 years",
-      "> 25 years",
+function experienceDistribution(data, { width }) {
+  return Plot.plot({
+    title: "By experience",
+    height: 400,
+    width: width,
+    marginLeft: 200,
+    marginRight: 100,
+    x: {
+      label: "Percentage of Participants",
+    },
+    y: {
+      label: "Experience Interval (years)",
+      domain: [
+        "< 1 year",
+        "1-3 years",
+        "4-6 years",
+        "7-10 years",
+        "10-15 years",
+        "15-20 years",
+        "20-25 years",
+        "> 25 years",
+      ],
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "experience_interval",
+
+        title: (d) => `Total count: ${d.total_count}`,
+      }),
+      Plot.text(data, {
+        x: "percentage",
+        y: "experience_interval",
+        text: (d) => `${d.percentage.toFixed(3)}%`,
+        dx: 10,
+        textAnchor: "start",
+      }),
     ],
-  },
-  marks: [
-    Plot.barX(experience, {
-      x: "percentage",
-      y: "experience_interval",
-
-      title: (d) => `Total count: ${d.total_count}`,
-    }),
-    Plot.text(experience, {
-      x: "percentage",
-      y: "experience_interval",
-      text: (d) => `${d.percentage.toFixed(3)}%`,
-      dx: 10,
-      textAnchor: "start",
-    }),
-  ],
-});
-
-experienceDistribution;
-
-display(experienceDistribution);
+  });
+}
 ```
-
-### Years in current company
 
 ```sql id=years_in_company
 
@@ -216,48 +245,47 @@ ORDER BY years_in_company_interval
 
 ```js
 // Create a grouped histogram
-const yearsInCompanyDistribution = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-  x: {
-    label: "Percentage of Participants",
-  },
-  y: {
-    label: "Years in Company Interval",
-    domain: [
-      "< 1 year",
-      "1-3 years",
-      "4-6 years",
-      "7-10 years",
-      "10-15 years",
-      "15-20 years",
-      "20-25 years",
-      "> 25 years",
+function yearsInCompanyDistribution(data, { width }) {
+  return Plot.plot({
+    title: "Years in current company",
+    height: 400,
+    width: width,
+    marginLeft: 200,
+    marginRight: 100,
+    x: {
+      label: "Percentage of Participants",
+    },
+    y: {
+      label: "Years in Company Interval",
+      domain: [
+        "< 1 year",
+        "1-3 years",
+        "4-6 years",
+        "7-10 years",
+        "10-15 years",
+        "15-20 years",
+        "20-25 years",
+        "> 25 years",
+      ],
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "years_in_company_interval",
+
+        title: (d) => `Total count: ${d.total_count}`,
+      }),
+      Plot.text(data, {
+        x: "percentage",
+        y: "years_in_company_interval",
+        text: (d) => `${d.percentage.toFixed(3)}%`,
+        dx: 10,
+        textAnchor: "start",
+      }),
     ],
-  },
-  marks: [
-    Plot.barX(years_in_company, {
-      x: "percentage",
-      y: "years_in_company_interval",
-
-      title: (d) => `Total count: ${d.total_count}`,
-    }),
-    Plot.text(years_in_company, {
-      x: "percentage",
-      y: "years_in_company_interval",
-      text: (d) => `${d.percentage.toFixed(3)}%`,
-      dx: 10,
-      textAnchor: "start",
-    }),
-  ],
-});
-
-display(yearsInCompanyDistribution);
+  });
+}
 ```
-
-### By education level
 
 ```sql id=education_level
 
@@ -273,38 +301,37 @@ GROUP BY education_level, estado
 ```
 
 ```js
-const educationLevelDistribution = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 200,
+function educationLevelDistribution(data, { width }) {
+  return Plot.plot({
+    title: "By education level",
+    height: 400,
+    width: width,
+    marginLeft: 200,
 
-  x: {
-    label: "Percentage of Participants",
-  },
-  y: {
-    label: "Education Level",
-  },
-  color: {
-    legend: true,
-    label: "Education Status",
-    scheme: "Observable10",
-  },
-  marks: [
-    Plot.barX(education_level, {
-      x: "percentage",
-      y: "education_level",
-      z: "education_status",
-      fill: "education_status",
-      sort: { y: "-x" },
-      title: (d) => `${d.education_status}: ${d.percentage.toFixed(3)}%`,
-    }),
-  ],
-});
-
-display(educationLevelDistribution);
+    x: {
+      label: "Percentage of Participants",
+    },
+    y: {
+      label: "Education Level",
+    },
+    color: {
+      legend: true,
+      label: "Education Status",
+      scheme: "Observable10",
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "education_level",
+        z: "education_status",
+        fill: "education_status",
+        sort: { y: "-x" },
+        title: (d) => `${d.education_status}: ${d.percentage.toFixed(3)}%`,
+      }),
+    ],
+  });
+}
 ```
-
-### Most common career paths
 
 ```sql id=career_paths
 
@@ -336,48 +363,47 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEndCareerPaths = Array.from(career_paths).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.career_path === "Other") return 1;
-  if (b.career_path === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function careerPathsDistribution(data, { width }) {
+  const sortOtherToEndCareerPaths = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.career_path === "Other") return 1;
+    if (b.career_path === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const careerPathsDistribution = Plot.plot({
-  height: 600,
-  width: 800,
-  marginLeft: 200,
-  marginRight: 100,
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Career Path",
-    domain: sortOtherToEndCareerPaths.map((d) => d.career_path), // Use sorted order for career paths
-  },
-  marks: [
-    Plot.barX(career_paths, {
-      x: "percentage",
-      y: "career_path",
-      tip: true,
-      title: (d) => `Total count: ${d.total_count}`,
-      fill: (d) => (d.career_path === "Other" ? "#EFB118" : "#4269D0"),
-    }),
-    Plot.text(career_paths, {
-      x: "percentage",
-      y: "career_path",
-      text: (d) => `${d.percentage.toFixed(2)} %`,
-      dx: 30,
-      textAnchor: "middle",
-    }),
-  ],
-});
-
-display(careerPathsDistribution);
+  return Plot.plot({
+    title: "Most common career paths",
+    height: 600,
+    width: width,
+    marginLeft: 200,
+    marginRight: 100,
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Career Path",
+      domain: sortOtherToEndCareerPaths.map((d) => d.career_path), // Use sorted order for career paths
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "career_path",
+        tip: true,
+        title: (d) => `Total count: ${d.total_count}`,
+        fill: (d) => (d.career_path === "Other" ? "#EFB118" : "#4269D0"),
+      }),
+      Plot.text(data, {
+        x: "percentage",
+        y: "career_path",
+        text: (d) => `${d.percentage.toFixed(2)} %`,
+        dx: 30,
+        textAnchor: "middle",
+      }),
+    ],
+  });
+}
 ```
-
-### Most common universities
 
 ```sql id=universities
 
@@ -409,48 +435,47 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEndUniversities = Array.from(universities).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.university === "Other") return 1;
-  if (b.university === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function universitiesDistribution(data, { width }) {
+  const sortOtherToEndUniversities = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.university === "Other") return 1;
+    if (b.university === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const universitiesDistribution = Plot.plot({
-  height: 600,
-  width: 800,
-  marginLeft: 400,
-  marginRight: 100,
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "University",
-    domain: sortOtherToEndUniversities.map((d) => d.university), // Use sorted order for universities
-  },
-  marks: [
-    Plot.barX(universities, {
-      x: "percentage",
-      y: "university",
-      tip: true,
-      title: (d) => `Total count: ${d.total_count}`,
-      fill: (d) => (d.university === "Other" ? "#EFB118" : "#4269D0"),
-    }),
-    Plot.text(universities, {
-      x: "percentage",
-      y: "university",
-      text: (d) => `${d.percentage.toFixed(2)} %`,
-      dx: 30,
-      textAnchor: "middle",
-    }),
-  ],
-});
-
-display(universitiesDistribution);
+  return Plot.plot({
+    title: "Most common universities",
+    height: 600,
+    width: width,
+    marginLeft: 400,
+    marginRight: 100,
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "University",
+      domain: sortOtherToEndUniversities.map((d) => d.university), // Use sorted order for universities
+    },
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "university",
+        tip: true,
+        title: (d) => `Total count: ${d.total_count}`,
+        fill: (d) => (d.university === "Other" ? "#EFB118" : "#4269D0"),
+      }),
+      Plot.text(data, {
+        x: "percentage",
+        y: "university",
+        text: (d) => `${d.percentage.toFixed(2)} %`,
+        dx: 30,
+        textAnchor: "middle",
+      }),
+    ],
+  });
+}
 ```
-
-### By gender
 
 ```sql id=gender
 
@@ -473,27 +498,28 @@ ORDER BY percentage DESC
 ```
 
 ```js
-const genderDistribution = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 100,
+function genderDistribution(data, { width }) {
+  return Plot.plot({
+    title: "By gender",
+    height: 400,
+    width: width,
+    marginLeft: 100,
 
-  x: {
-    label: "Percentage of Participants",
-  },
-  y: {
-    label: "Gender",
-  },
+    x: {
+      label: "Percentage of Participants",
+    },
+    y: {
+      label: "Gender",
+    },
 
-  marks: [
-    Plot.barX(gender, {
-      x: "percentage",
-      y: "gender",
-      sort: { y: "-x" },
-      title: (d) => `${d.gender}: ${d.percentage.toFixed(3)}%`,
-    }),
-  ],
-});
-
-display(genderDistribution);
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "gender",
+        sort: { y: "-x" },
+        title: (d) => `${d.gender}: ${d.percentage.toFixed(3)}%`,
+      }),
+    ],
+  });
+}
 ```
