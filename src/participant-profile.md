@@ -12,6 +12,13 @@ import type * as PlotType from "@observablehq/plot";
 let PlotTyped: typeof PlotType = Plot;
 ```
 
+
+# Participant profile
+
+First, let's take a look at the distribution of participants by region, role, experience, years in company, education level, career paths and universities.
+
+
+
 <div class="grid grid-cols-2">
   <div class="card">
     ${resize((width) => salaryDistribution(percentage_per_region, {width}))}
@@ -130,7 +137,7 @@ function roleDistribution(data, { width }) {
     height: 600,
     width: width,
     marginLeft: 200,
-    marginRight: 100,
+    marginRight: 50,
     x: {
       label: "Percentage of participants",
     },
@@ -185,8 +192,8 @@ function experienceDistribution(data, { width }) {
     title: "By experience",
     height: 400,
     width: width,
-    marginLeft: 200,
-    marginRight: 100,
+    marginLeft: 100,
+    marginRight: 50,
     x: {
       label: "Percentage of Participants",
     },
@@ -250,8 +257,8 @@ function yearsInCompanyDistribution(data, { width }) {
     title: "Years in current company",
     height: 400,
     width: width,
-    marginLeft: 200,
-    marginRight: 100,
+    marginLeft: 100,
+    marginRight: 50,
     x: {
       label: "Percentage of Participants",
     },
@@ -304,9 +311,9 @@ GROUP BY education_level, estado
 function educationLevelDistribution(data, { width }) {
   return Plot.plot({
     title: "By education level",
-    height: 400,
+    height: 600,
     width: width,
-    marginLeft: 200,
+    marginLeft:150,
 
     x: {
       label: "Percentage of Participants",
@@ -376,8 +383,8 @@ function careerPathsDistribution(data, { width }) {
     title: "Most common career paths",
     height: 600,
     width: width,
-    marginLeft: 200,
-    marginRight: 100,
+    marginLeft: 250,
+    marginRight: 50,
     x: {
       label: "Percentage of participants",
     },
@@ -449,7 +456,7 @@ function universitiesDistribution(data, { width }) {
     height: 600,
     width: width,
     marginLeft: 400,
-    marginRight: 100,
+    marginRight: 50,
     x: {
       label: "Percentage of participants",
     },
@@ -501,10 +508,11 @@ ORDER BY percentage DESC
 function genderDistribution(data, { width }) {
   return Plot.plot({
     title: "By gender",
-    height: 400,
+    height: 600,
     width: width,
-    marginLeft: 100,
+    marginLeft: 50,
 
+    grid: true,
     x: {
       label: "Percentage of Participants",
     },
@@ -513,10 +521,10 @@ function genderDistribution(data, { width }) {
     },
 
     marks: [
-      Plot.barX(data, {
-        x: "percentage",
-        y: "gender",
-        sort: { y: "-x" },
+      Plot.barY(data, {
+        y: "percentage",
+        x: "gender",
+        sort: { x: "-y" },
         title: (d) => `${d.gender}: ${d.percentage.toFixed(3)}%`,
       }),
     ],

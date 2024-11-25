@@ -12,6 +12,10 @@ sql:
 var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 ```
 
+# Gender
+
+Now let's see if there is a difference in participation, salaries, and accordance
+
 <div class="grid grid-cols-2">
   <div class="card">
       ${resize((width) => genderDistribution(gender_identity, {width}))}
