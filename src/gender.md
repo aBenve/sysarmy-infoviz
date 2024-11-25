@@ -2,6 +2,7 @@
 title: Gender
 sql: 
   db: ./data/2024-01.csv 
+  historic: ./data/historic.csv 
 ---
 
 
@@ -111,11 +112,188 @@ display(salaryDistribution)
 ```
 
 ### Historic pacticipation
-TODO
+
+
+
+```sql id=historic_participation
+WITH all_historic_participation as (
+  select genero as gender, fecha as date, count(*) as count, 
+    ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
+  from historic
+  group by genero, fecha
+)
+
+SELECT *
+FROM all_historic_participation
+WHERE percentage >= 1
+UNION ALL
+(
+    SELECT 'Other' AS gender, date, SUM(count)::int AS count, SUM(percentage) AS percentage
+    FROM all_historic_participation
+    WHERE percentage < 1
+    group by date
+)
+order by date
+```
+
+```js
+const historicParticipationFixed = Array.from(historic_participation).map(o => ({
+  date: new Date(o.date),
+  gender: o.gender,
+  count: o.count
+}));
+
+display(Plot.plot({
+  height: 400,
+  width: 800,
+  marginLeft: 150,
+  marginRight: 100,
+  y: {
+    label: "Participation (%)",
+    percent: true
+  },
+  color: {
+    legend: true,
+    label: "Gender",
+    scheme: "Observable10",
+  },
+  marks: [
+    Plot.areaY(historicParticipationFixed,
+      Plot.stackY(
+        {
+          offset: "normalize", order: "count", reverse:true
+        },
+        {
+          x: "date", y: "count", tip: true,
+          fill: "gender"
+        }
+      )
+    ),
+    Plot.ruleY([0, 1])
+  ]
+}))
+```
+
 ### Historic salaries
-TODO
+
+```sql id=historic_salaries
+WITH all_historic_salaries as (
+  select genero as gender, fecha as date, sum(salario) as salary_sum, count(*) as count, 
+    ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
+  from historic
+  group by genero, fecha
+)
+
+SELECT gender, date, salary_sum / count as salary
+from
+(
+    select *
+    FROM all_historic_salaries
+    WHERE percentage >= 1
+    UNION ALL
+    (
+        SELECT 'Other' AS gender, date, SUM(salary_sum) AS salary_sum, SUM(count)::int AS count, SUM(percentage) AS percentage
+        FROM all_historic_salaries
+        WHERE percentage < 1
+        group by date
+    )
+)
+order by date
+```
+
+
+```js
+
+const historicSalariesFixed = Array.from(historic_salaries).map(o => ({
+  date: new Date(o.date),
+  gender: o.gender,
+  salary: o.salary
+}));
+
+display(Plot.plot({
+  height: 400,
+  width: 800,
+  marginLeft: 150,
+  marginRight: 100,
+  y: {
+    label: "Salary",
+  },
+  color: {
+    legend: true,
+    label: "Gender",
+    scheme: "Observable10",
+  },
+  marks: [
+    Plot.lineY(historicSalariesFixed,
+      {
+        x: "date", y: "salary", tip: true,
+        stroke: "gender"
+      }
+    ),
+  ]
+}))
+```
+
 ### Historic accordance
-TODO
+
+```sql id=historic_accordance
+WITH all_historic_accordance as (
+  select genero as gender, fecha as date, sum(conformidad) as conformity_sum, count(*) as count, 
+    ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
+  from historic
+  group by genero, fecha
+)
+
+SELECT gender, date, conformity_sum / count as conformity
+from
+(
+    select *
+    FROM all_historic_accordance
+    WHERE percentage >= 1
+    UNION ALL
+    (
+        SELECT 'Other' AS gender, date, SUM(conformity_sum) AS conformity_sum, SUM(count)::int AS count, SUM(percentage) AS percentage
+        FROM all_historic_accordance
+        WHERE percentage < 1
+        group by date
+    )
+)
+order by date
+```
+
+
+```js
+
+
+const historicAccordanceFixed = Array.from(historic_accordance).map(o => ({
+  date: new Date(o.date),
+  gender: o.gender,
+  conformity: o.conformity
+}));
+
+display(Plot.plot({
+  height: 400,
+  width: 800,
+  marginLeft: 150,
+  marginRight: 100,
+  y: {
+    label: "Accordance"
+  },
+  color: {
+    legend: true,
+    label: "Gender",
+    scheme: "Observable10",
+  },
+  marks: [
+    Plot.lineY(historicAccordanceFixed,
+      {
+        x: "date", y: "conformity", tip: true,
+        stroke: "gender"
+      }
+    ),
+  ]
+}))
+```
 
 ### By studies and completition
 
@@ -279,8 +457,78 @@ display(participationExperience)
 
 ```
 
-### Historic participation by experience
-TODO
+### Participation by experience
+
+```sql id=experience_participation
+WITH all_experience_participation AS (
+SELECT
+  genero AS gender,
+  min(anos_de_experiencia) as experience_min,
+  CASE 
+    WHEN anos_de_experiencia BETWEEN 0 AND 1 THEN '0-1'
+    WHEN anos_de_experiencia BETWEEN 2 AND 3 THEN '2-3'
+    WHEN anos_de_experiencia BETWEEN 4 AND 5 THEN '4-5'
+    WHEN anos_de_experiencia BETWEEN 6 AND 7 THEN '6-7'
+    WHEN anos_de_experiencia BETWEEN 8 AND 9 THEN '8-9'
+    WHEN anos_de_experiencia BETWEEN 10 AND 15 THEN '10-15'
+    ELSE '15+'        
+  END AS experience_bin,
+  COUNT(*) AS total_count,
+  ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (PARTITION BY genero)) * 100, 3) AS percentage
+FROM "db"
+WHERE genero IN ('Hombre Cis', 'Mujer Cis')
+GROUP BY genero, experience_bin
+)
+
+SELECT gender, experience_min, experience_bin, total_count
+FROM all_experience_participation
+WHERE percentage > 1
+ORDER BY experience_min
+```
+
+```js
+const experienceParticipationFixed = Array.from(experience_participation).map(o => ({
+  experience_bin: o.experience_bin,
+  experience_min: o.experience_min,
+  gender: o.gender,
+  total_count: o.total_count
+}));
+
+display(Plot.plot({
+  height: 400,
+  width: 800,
+  marginLeft: 150,
+  marginRight: 100,
+  x: {
+    label: "Experience Bin",
+    domain: ['0-1', '2-3', '4-5', '6-7', '8-9', '10-15', "15+"]
+  },
+  y: {
+    label: "Participation (%)",
+    percent: true
+  },
+  color: {
+    legend: true,
+    label: "Gender",
+    scheme: "Observable10",
+  },
+  marks: [
+    Plot.areaY(experienceParticipationFixed,
+      Plot.stackY(
+        {
+          offset: "normalize", order: "experience_min"
+        },
+        {
+          x: "experience_bin", y: "total_count", tip: true,
+          fill: "gender"
+        }
+      )
+    ),
+    Plot.ruleY([0, 1])
+  ]
+}))
+```
+
 
 ### By accordance
 
