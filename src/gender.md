@@ -357,7 +357,7 @@ display(studiesCompletionChart)
 
 ### Salaries by experience
 
-```sql id=studies display
+```sql id=studies
 
 
 WITH gender As (
@@ -406,55 +406,6 @@ stroke: "gender", curve: "natural"}),
 
 display(studiesLineChart)
 
-
-```
-
-### By participation and experience
-
-```sql id=participation_experience
-
-WITH participation AS (
-SELECT
-  genero AS gender,
-  anos_de_experiencia AS experience,
-  COUNT(*) AS total_count,
-  ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
-FROM "db"
-GROUP BY genero, anos_de_experiencia
-)
-
-SELECT *
-FROM participation
-WHERE percentage > 1
-ORDER BY experience DESC
-
-```
-
-```js
-
-const participationExperience = Plot.plot({
-  height: 400,
-  width: 800,   
-  marginLeft: 100,
-  marginRight: 100,    
-  x: {
-    label: "Amount of participants"
-  },
-  y: {
-    label: "Experience"
-  },
-  
-  marks: [
-    Plot.barX(participation_experience, {
-        x: "percentage",
-        y: "experience",
-        fill: "gender",
-        tip:true
-    }),
-  ]
-})
-
-display(participationExperience)
 
 ```
 
