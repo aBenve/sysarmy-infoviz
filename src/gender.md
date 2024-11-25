@@ -61,7 +61,7 @@ Claramente los Hombre Cis y Mujeres Cis son la mayoria de los participantes, asi
 WITH gender As (
 SELECT
   genero AS gender,
-  AVG(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS average_salary,
+  median(ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos) AS average_salary,
   seniority,
   COUNT(*) AS total_count, 
   ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
@@ -364,7 +364,7 @@ WITH gender As (
 SELECT
   genero AS gender,
   anos_de_experiencia AS experience,
-  median(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS average_salary,
+  median(ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos) AS average_salary,
   COUNT(*) AS total_count
 FROM "db"
 where genero in ('Hombre Cis', 'Mujer Cis')
@@ -533,7 +533,8 @@ const accordanceChart = Plot.plot({
     domain: ['0-1', '2-3', '4-5', '6-7', '8-9', '10-15', "15+"]
   },
   y: {
-    label: "Accordance Level"
+    label: "Accordance Level",
+    domain: [0, 5],
   },
   color: {
     legend: true,
@@ -546,7 +547,7 @@ const accordanceChart = Plot.plot({
       x: "experience_bin",
       y: "accordance_level",
       stroke: "gender",
-      curve: "linear",
+      curve: "natural",
         tip: true
     }),
     Plot.dot(accordance, {

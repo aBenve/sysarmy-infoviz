@@ -183,19 +183,19 @@ function amountOfGuards(data, {width}){
 WITH median_salary_cte AS (
   SELECT 
     trabajo_de AS role,
-    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS median_salary
+    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos) AS median_salary
   FROM db
-  WHERE ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+  WHERE ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
   GROUP BY trabajo_de
 )
 
 SELECT 
   db.trabajo_de AS role,
-  -- AVG(db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS avg_salary,
+  -- AVG(db.ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos) AS avg_salary,
   median_salary_cte.median_salary
 FROM db
 JOIN median_salary_cte ON db.trabajo_de = median_salary_cte.role
-WHERE db.ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+WHERE db.ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
 GROUP BY db.trabajo_de, median_salary_cte.median_salary
 ORDER BY median_salary_cte.median_salary DESC
 LIMIT 10

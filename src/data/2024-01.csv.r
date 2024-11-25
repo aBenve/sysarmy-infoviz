@@ -121,7 +121,7 @@ v <- read_csv(
     ) ~ NA_character_,
     TRUE ~ genero
   )) |>
-  filter(!is.na(genero) & !is.na(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos))
+  filter(!is.na(genero) & !is.na(ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos))
 
 # v |>
 # group_by(conformidad)|>
@@ -133,7 +133,7 @@ v <- read_csv(
 # count() |>
 # arrange(desc(n))
 
-col <- quo(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos)
+col <- quo(ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos)
 
 v |>
   filter(between(UQ(col), quantile(UQ(col), 0.035), quantile(UQ(col), 1 - 0.035))) |>

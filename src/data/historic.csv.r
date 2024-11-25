@@ -213,7 +213,7 @@ v <- read_semester(2016, 1) |>
     neto = as.numeric(neto),
     conformidad = as.numeric(conformidad),
   ) |>
-  select(-bruto, salario = neto) |>
+  select(-neto, salario = bruto) |>
   mutate(genero = case_when(
     str_detect(
       genero,

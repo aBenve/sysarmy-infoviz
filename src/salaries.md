@@ -7,12 +7,10 @@ sql:
 
 ### Median Salaries
 
-TODO: change average for median
-
 ```sql id=salary_per_semester
 
 SELECT 
-    AVG(salario) AS mean_salary,
+    median(salario) AS mean_salary,
     fecha AS date
 FROM historic
 GROUP BY date;
@@ -31,7 +29,7 @@ const salaryBySemester = Plot.plot({
     label: "Date",
   },
   y: {
-    label: "Salary",
+    label: "Median Salary",
   },
 
   marks: [
@@ -59,10 +57,10 @@ WITH categorized_salaries AS (
             WHEN si_tu_sueldo_esta_dolarizado_cual_fue_el_ultimo_valor_del_dolar_que_tomaron IS NOT NULL THEN 'dolarized'
             ELSE 'not dolarized'
         END AS salary_type,
-        ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary
+        ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
     FROM "db"
     WHERE 
-        ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+        ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
         AND seniority IS NOT NULL
 ),
 ranked_salaries AS (
@@ -77,7 +75,7 @@ ranked_salaries AS (
 SELECT 
     seniority,
     salary_type,
-    AVG(salary) AS median_salary
+    median(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
     row_num IN ((total_count + 1) / 2, (total_count + 2) / 2) 
@@ -130,10 +128,10 @@ WITH categorized_salaries AS (
     SELECT 
         seniority,
         trabajo_de AS job_title,
-        ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary
+        ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
     FROM "db"
     WHERE 
-        ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+        ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
         AND seniority IS NOT NULL
         AND trabajo_de IS NOT NULL
 ),
@@ -152,7 +150,7 @@ ranked_salaries AS (
 SELECT 
     seniority,
     job_title,
-    AVG(salary) AS median_salary
+    median(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
     total_count > 10
@@ -212,10 +210,10 @@ WITH categorized_salaries AS (
       WHEN si_tu_sueldo_esta_dolarizado_cual_fue_el_ultimo_valor_del_dolar_que_tomaron IS NOT NULL THEN 'dolarized'
       ELSE 'not dolarized'
     END AS salary_type,
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
   WHERE 
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND maximo_nivel_de_estudios IS NOT NULL
 ),
 ranked_salaries AS (
@@ -230,7 +228,7 @@ ranked_salaries AS (
 SELECT 
   education_level,
   salary_type,
-  AVG(salary) AS median_salary,
+  median(salary) AS median_salary,
   total_count
 FROM ranked_salaries
 WHERE total_count > 20
@@ -278,10 +276,10 @@ WITH categorized_salaries AS (
   SELECT 
     seniority,
     carrera AS career,
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
   WHERE 
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND seniority IS NOT NULL
     AND carrera IS NOT NULL
 ),
@@ -297,7 +295,7 @@ ranked_salaries AS (
 SELECT 
   seniority,
   career,
-  AVG(salary) AS median_salary
+  median(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
     total_count > 10
@@ -352,10 +350,10 @@ WITH categorized_salaries AS (
   SELECT 
     seniority,
     UNNEST(STRING_TO_ARRAY(plataformas_que_utilizas_en_tu_puesto_actual, ','))::TEXT AS technology,
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
   WHERE 
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND seniority IS NOT NULL
     AND plataformas_que_utilizas_en_tu_puesto_actual IS NOT NULL
 ),
@@ -371,7 +369,7 @@ ranked_salaries AS (
 SELECT 
   seniority,
   technology,
-  AVG(salary) AS median_salary
+  median(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
     total_count > 10
@@ -428,10 +426,10 @@ WITH categorized_salaries AS (
   SELECT 
     seniority,
     UNNEST(STRING_TO_ARRAY(lenguajes_de_programacion_o_tecnologias_que_utilices_en_tu_puesto_actual, ','))::TEXT AS programming_language,
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos AS salary
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
   WHERE 
-    ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos IS NOT NULL
+    ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND seniority IS NOT NULL
     AND lenguajes_de_programacion_o_tecnologias_que_utilices_en_tu_puesto_actual IS NOT NULL
 ),
@@ -447,7 +445,7 @@ ranked_salaries AS (
 SELECT 
   seniority,
   programming_language,
-  AVG(salary) AS median_salary
+  median(salary) AS median_salary
 FROM ranked_salaries
 WHERE 
     total_count > 10
