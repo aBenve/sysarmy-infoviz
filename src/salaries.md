@@ -61,7 +61,7 @@ function salaryBySemester(data, { width }) {
     mean_salary: o.mean_salary,
   }));
   return Plot.plot({
-    title: "Median Salaries",
+    title: "Historic salaries by semester",
     height: 400,
     width: width,
     marginLeft: 100,
