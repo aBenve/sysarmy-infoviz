@@ -63,7 +63,7 @@ GROUP BY donde_estas_trabajando
 ```ts
 function salaryDistribution(data, { width }) {
   return Plot.plot({
-    title: "From where are the participants?",
+    title: "Where are the participants from?",
     height: 600,
     width: width,
     marginLeft: 200,
@@ -324,6 +324,7 @@ function educationLevelDistribution(data, { width }) {
     color: {
       legend: true,
       label: "Education Status",
+      domain: ["Completo", "En curso", "Incompleto"],
       scheme: "Observable10",
     },
     marks: [

@@ -476,7 +476,7 @@ function studiesLineChart(data, { width }) {
         x: "experience",
         y: "average_salary",
         fill: "gender",
-        r: 5,
+        r: 3,
         tip: {
           format: {
             y: apesos,
