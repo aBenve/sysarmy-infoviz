@@ -334,6 +334,7 @@ function educationLevelDistribution(data, { width }) {
         fill: "education_status",
         sort: { y: "-x" },
         title: (d) => `${d.education_status}: ${d.percentage.toFixed(3)}%`,
+        tip: true,
       }),
     ],
   });
@@ -526,6 +527,7 @@ function genderDistribution(data, { width }) {
         x: "gender",
         sort: { x: "-y" },
         title: (d) => `${d.gender}: ${d.percentage.toFixed(3)}%`,
+        tip: true,
       }),
     ],
   });
