@@ -75,7 +75,7 @@ function genderDistribution(data, { width }) {
     title: "By Gender identity",
     height: 400,
     width: width,
-    marginLeft: 200,
+    marginLeft: 120,
     marginRight: 100,
     x: {
       label: "Amount of participants",
@@ -129,15 +129,18 @@ function salaryDistribution(data, { width }) {
     title: "Wage gap between man and woman",
     height: 400,
     width: width,
-    marginLeft: 200,
+    marginLeft: 100,
     marginRight: 100,
     x: {
       label: "Median Salary",
       tickFormat: apesos,
+      ticks: 5,
     },
     y: {
       label: "Region",
     },
+    grid: true,
+
     color: {
       legend: true,
       label: "Seniority",
@@ -195,8 +198,8 @@ function historicParticipation(data, { width }) {
     title: "Historic participation",
     height: 400,
     width: width,
-    marginLeft: 150,
-    marginRight: 100,
+    marginLeft: 50,
+    marginRight: 50,
     y: {
       label: "Participation (%)",
       percent: true,
@@ -265,9 +268,10 @@ function historicSalaries(data, { width }) {
   return Plot.plot({
     title: "Historic salaries",
     height: 400,
+    grid: true,
     width: width,
-    marginLeft: 150,
-    marginRight: 100,
+    marginLeft: 100,
+    marginRight: 50,
     y: {
       label: "Salary",
       tickFormat: apesos,
@@ -329,9 +333,10 @@ function historicAccordance(data, { width }) {
   return Plot.plot({
     title: "Historic accordance",
     height: 400,
+    grid: true,
     width: width,
-    marginLeft: 150,
-    marginRight: 100,
+    marginLeft: 50,
+    marginRight: 50,
     y: {
       label: "Accordance",
       domain: [0, 5],
@@ -381,6 +386,8 @@ function studiesCompletionChart(data, { width }) {
     title: "By studies and completition",
     height: 400,
     width: width,
+    grid: true,
+
     marginLeft: 150,
     marginRight: 100,
     x: {
@@ -439,6 +446,8 @@ function studiesLineChart(data, { width }) {
     width: width,
     marginLeft: 100,
     marginRight: 100,
+    grid: true,
+
     x: {
       label: "Experience",
     },
@@ -516,7 +525,8 @@ function experienceParticipation(data, { width }) {
     title: "Participation by experience",
     height: 400,
     width: width,
-    marginLeft: 150,
+    marginLeft: 50,
+
     marginRight: 100,
     x: {
       label: "Experience Bin",
@@ -596,8 +606,10 @@ function accordanceChart(data, { width }) {
     title: "By accordance",
     height: 400,
     width: width,
-    marginLeft: 150,
-    marginRight: 100,
+    grid: true,
+
+    marginLeft: 50,
+    marginRight: 50,
     x: {
       label: "Experience Bin",
       domain: ["0-1", "2-3", "4-5", "6-7", "8-9", "10-15", "15+"],

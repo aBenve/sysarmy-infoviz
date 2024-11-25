@@ -76,9 +76,7 @@ function contractType(data, { width }) {
         dx: 40,
         align: "left",
         baseline: "middle",
-        color: "black",
-        font: "Arial",
-        fontSize: 12,
+
       }),
     ],
   });
@@ -105,6 +103,7 @@ function salaryInDollars(data, { width }) {
     title: "By amount of salary in dollars",
     width: width,
     marginLeft: 290,
+    marginRight: 70,
 
     marks: [
       Plot.barX(salary_in_dollars, {
@@ -114,12 +113,14 @@ function salaryInDollars(data, { width }) {
         tip: true,
       }),
       Plot.text(salary_in_dollars, {
-        text: (d) => `${d.salary_in_dollars}: ${d.percentage}%`,
-        dy: 5,
-        dx: 5,
-        font: "Arial",
+        x: "percentage",
+        y: "salary_in_dollars",
+        text: (d) => `${d.percentage}%`,
+
+        dx: 30,
+
         fontSize: 12,
-        fill: "black",
+
       }),
     ],
   });
@@ -161,12 +162,15 @@ function amountOfGuards(data, { width }) {
         tip: true,
       }),
       Plot.text(data, {
-        text: (d) => `${d.amount_of_guards}: ${d.percentage}%`,
-        dy: 5,
-        dx: 5,
+        text: (d) => `${d.percentage}%`,
+
+
+        x: "percentage",
+        y: "amount_of_guards",
+
+        dx: 30,
         font: "Arial",
         fontSize: 12,
-        fill: "black",
       }),
     ],
   });
@@ -207,6 +211,8 @@ function top10RolesSalary(data, { width }) {
     width: width,
     marginLeft: 150,
     marginRight: 10,
+    grid: true,
+
     x: {
       label: "Median Salary",
     },
@@ -256,12 +262,26 @@ function bonus(data, { width }) {
     height: 400,
     width: width,
     marginLeft: 150,
+    marginRight: 50,
     marks: [
       Plot.barX(by_bonus, {
         x: "percentage",
         y: "bonus",
         sort: { y: "-x" },
         tip: true,
+      }),
+
+
+        Plot.text(data, {
+        text: (d) => `${d.percentage}%`,
+
+
+        x: "percentage",
+        y: "bonus",
+
+        dx: 30,
+        font: "Arial",
+        fontSize: 12,
       }),
     ],
   });
@@ -299,6 +319,7 @@ function benefits(data, { width }) {
   return Plot.plot({
     title: "By benefits",
     height: 400,
+grid: true,
     width: width,
     marginLeft: 300,
 
@@ -349,6 +370,8 @@ function amountOfEmployees(data, { width }) {
     title: "By amount of employees",
     height: 400,
     width: width,
+grid: true,
+
     marginLeft: 180,
 
     marks: [
@@ -382,6 +405,8 @@ function workModalities(data, { width }) {
     title: "By work modalities",
     height: 400,
     width: width,
+grid: true,
+
 
     marks: [
       Plot.barY(data, {
@@ -418,6 +443,8 @@ function happinessInWorkplace(data, { width }) {
   return Plot.plot({
     title: "By happiness in the workplace",
     height: 400,
+grid: true,
+
     width: width,
 
     x: {
@@ -458,6 +485,8 @@ function discomfortInWorkplace(data, { width }) {
   return Plot.plot({
     title: "By discomfort in the workplace",
     width: width,
+grid: true,
+
 
     x: {
       label: "Different levels of discomfort",
