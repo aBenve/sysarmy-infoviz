@@ -7,6 +7,11 @@ sql:
   db: ./data/2024-01.csv
 ---
 
+# Tecnologies
+
+This is a summary of the technologies used by the participants.
+
+
 <div class="grid grid-cols-2">
     <div class="card">
         ${resize((width) => participantsPerPlatform(platforms, {width}))}
@@ -77,10 +82,9 @@ function participantsPerPlatform(data, { width }) {
 
   return Plot.plot({
     title: "By platform",
-    height: 800,
+    height: 600,
     width: width,
     marginLeft: 200,
-    marginBottom: 100,
     marginRight: 50,
 
     x: {
@@ -151,10 +155,9 @@ function participantsPerLanguage(data, { width }) {
 
   return Plot.plot({
     title: "By programming language",
-    height: 800,
+    height: 600,
     width: width,
     marginLeft: 200,
-    marginBottom: 100,
     marginRight: 50,
 
     x: {
@@ -224,10 +227,10 @@ function participantsPerFramework(data, { width }) {
 
   return Plot.plot({
     title: "By framework, tools and libraries",
-    height: 800,
+    height: 600,
     width: width,
     marginLeft: 200,
-    marginBottom: 100,
+
     marginRight: 50,
 
     x: {
@@ -297,10 +300,10 @@ function participantsPerDatabase(data, { width }) {
 
   return Plot.plot({
     title: "By data bases",
-    height: 800,
+    height: 600,
     width: width,
     marginLeft: 200,
-    marginBottom: 100,
+
     marginRight: 50,
 
     x: {
@@ -370,10 +373,10 @@ function participantsPerTestingTool(data, { width }) {
 
   return Plot.plot({
     title: "By Qa/Testing",
-    height: 800,
+    height: 600,
     width: width,
     marginLeft: 200,
-    marginBottom: 100,
+
     marginRight: 50,
 
     x: {
@@ -413,10 +416,10 @@ GROUP BY que_tanto_estas_usando_copilotchatgpt_u_otras_herramientas_de_ia_para_t
 function iaUse(data, { width }) {
   return Plot.plot({
     title: "By AI use",
-    height: 400,
+    height: 600,
     width: width,
-    marginLeft: 100,
-    marginRight: 100,
+    marginLeft: 50,
+    marginRight: 50,
     x: {
       label: "Amount of participants",
     },
@@ -425,10 +428,10 @@ function iaUse(data, { width }) {
     },
 
     marks: [
-      Plot.barX(data, {
-        x: "percentage",
-        y: "ia_use",
-        sort: { y: "-x" },
+      Plot.barY(data, {
+        y: "percentage",
+        x: "ia_use",
+        sort: { x: "-y" },
         tip: true,
       }),
 
