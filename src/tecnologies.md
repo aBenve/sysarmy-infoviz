@@ -1,10 +1,36 @@
 ---
 title: Tecnologies
+theme: dashboard
+toc: false
+
 sql:
   db: ./data/2024-01.csv
 ---
 
-### By platform
+<div class="grid grid-cols-2">
+    <div class="card">
+        ${resize((width) => participantsPerPlatform(platforms, {width}))}
+    </div>
+    <div class="card">
+        ${resize((width) => participantsPerLanguage(programming_languages, {width}))}
+    </div>
+</div>
+<div class="grid grid-cols-2">
+    <div class="card">
+        ${resize((width) => participantsPerFramework(frameworks_tools_libraries, {width}))}
+    </div>
+    <div class="card">
+        ${resize((width) => participantsPerDatabase(databases, {width}))}
+    </div>
+</div>
+<div class="grid grid-cols-2">
+    <div class="card">
+        ${resize((width) => participantsPerTestingTool(qa_testing, {width}))}
+    </div>
+    <div class="card">
+        ${resize((width) => iaUse(ia_use, {width}))}
+    </div>
+</div>
 
 ```sql id=platforms
 
@@ -40,45 +66,44 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEnd = Array.from(platforms).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.platform === "Other") return 1;
-  if (b.platform === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function participantsPerPlatform(data, { width }) {
+  const sortOtherToEnd = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.platform === "Other") return 1;
+    if (b.platform === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const participantsPerPlatform = Plot.plot({
-  height: 800,
-  width: 800,
-  marginLeft: 200,
-  marginBottom: 100,
-  marginRight: 50,
+  return Plot.plot({
+    title: "By platform",
+    height: 800,
+    width: width,
+    marginLeft: 200,
+    marginBottom: 100,
+    marginRight: 50,
 
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Platform",
-    grid: true,
-    domain: sortOtherToEnd.map((d) => d.platform), // Use sorted order for roles
-  },
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Platform",
+      grid: true,
+      domain: sortOtherToEnd.map((d) => d.platform), // Use sorted order for roles
+    },
 
-  marks: [
-    Plot.barX(platforms, {
-      y: "platform",
-      x: "percentage",
-      fill: (d) => (d.platform === "Other" ? "#EFB118" : "#4269D0"),
-      sort: { y: "-x" },
-      tip: true,
-    }),
-  ],
-});
-
-display(participantsPerPlatform);
+    marks: [
+      Plot.barX(data, {
+        y: "platform",
+        x: "percentage",
+        fill: (d) => (d.platform === "Other" ? "#EFB118" : "#4269D0"),
+        sort: { y: "-x" },
+        tip: true,
+      }),
+    ],
+  });
+}
 ```
-
-### By programming language
 
 ```sql id=programming_languages
 
@@ -115,45 +140,44 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEnd = Array.from(programming_languages).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.language === "Other") return 1;
-  if (b.language === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function participantsPerLanguage(data, { width }) {
+  const sortOtherToEnd = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.language === "Other") return 1;
+    if (b.language === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const participantsPerLanguage = Plot.plot({
-  height: 800,
-  width: 800,
-  marginLeft: 200,
-  marginBottom: 100,
-  marginRight: 50,
+  return Plot.plot({
+    title: "By programming language",
+    height: 800,
+    width: width,
+    marginLeft: 200,
+    marginBottom: 100,
+    marginRight: 50,
 
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Language",
-    grid: true,
-    domain: sortOtherToEnd.map((d) => d.language),
-  },
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Language",
+      grid: true,
+      domain: sortOtherToEnd.map((d) => d.language),
+    },
 
-  marks: [
-    Plot.barX(programming_languages, {
-      y: "language",
-      x: "percentage",
-      fill: (d) => (d.language === "Other" ? "#EFB118" : "#4269D0"),
-      sort: { y: "-x" },
-      tip: true,
-    }),
-  ],
-});
-
-display(participantsPerLanguage);
+    marks: [
+      Plot.barX(data, {
+        y: "language",
+        x: "percentage",
+        fill: (d) => (d.language === "Other" ? "#EFB118" : "#4269D0"),
+        sort: { y: "-x" },
+        tip: true,
+      }),
+    ],
+  });
+}
 ```
-
-### By framework, tools and libraries
 
 ```sql id=frameworks_tools_libraries
 
@@ -189,45 +213,44 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEnd = Array.from(frameworks_tools_libraries).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.framework === "Other") return 1;
-  if (b.framework === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function participantsPerFramework(data, { width }) {
+  const sortOtherToEnd = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.framework === "Other") return 1;
+    if (b.framework === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const participantsPerFramework = Plot.plot({
-  height: 800,
-  width: 800,
-  marginLeft: 200,
-  marginBottom: 100,
-  marginRight: 50,
+  return Plot.plot({
+    title: "By framework, tools and libraries",
+    height: 800,
+    width: width,
+    marginLeft: 200,
+    marginBottom: 100,
+    marginRight: 50,
 
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Framework",
-    grid: true,
-    domain: sortOtherToEnd.map((d) => d.framework),
-  },
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Framework",
+      grid: true,
+      domain: sortOtherToEnd.map((d) => d.framework),
+    },
 
-  marks: [
-    Plot.barX(frameworks_tools_libraries, {
-      y: "framework",
-      x: "percentage",
-      fill: (d) => (d.framework === "Other" ? "#EFB118" : "#4269D0"),
-      sort: { y: "-x" },
-      tip: true,
-    }),
-  ],
-});
-
-display(participantsPerFramework);
+    marks: [
+      Plot.barX(data, {
+        y: "framework",
+        x: "percentage",
+        fill: (d) => (d.framework === "Other" ? "#EFB118" : "#4269D0"),
+        sort: { y: "-x" },
+        tip: true,
+      }),
+    ],
+  });
+}
 ```
-
-### By data bases
 
 ```sql id=databases
 
@@ -263,45 +286,44 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEnd = Array.from(databases).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.database === "Other") return 1;
-  if (b.database === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function participantsPerDatabase(data, { width }) {
+  const sortOtherToEnd = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.database === "Other") return 1;
+    if (b.database === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const participantsPerDatabase = Plot.plot({
-  height: 800,
-  width: 800,
-  marginLeft: 200,
-  marginBottom: 100,
-  marginRight: 50,
+  return Plot.plot({
+    title: "By data bases",
+    height: 800,
+    width: width,
+    marginLeft: 200,
+    marginBottom: 100,
+    marginRight: 50,
 
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Database",
-    grid: true,
-    domain: sortOtherToEnd.map((d) => d.database),
-  },
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Database",
+      grid: true,
+      domain: sortOtherToEnd.map((d) => d.database),
+    },
 
-  marks: [
-    Plot.barX(databases, {
-      y: "database",
-      x: "percentage",
-      fill: (d) => (d.database === "Other" ? "#EFB118" : "#4269D0"),
-      sort: { y: "-x" },
-      tip: true,
-    }),
-  ],
-});
-
-display(participantsPerDatabase);
+    marks: [
+      Plot.barX(data, {
+        y: "database",
+        x: "percentage",
+        fill: (d) => (d.database === "Other" ? "#EFB118" : "#4269D0"),
+        sort: { y: "-x" },
+        tip: true,
+      }),
+    ],
+  });
+}
 ```
-
-### By Qa/Testing
 
 ```sql id=qa_testing
 
@@ -337,45 +359,44 @@ ORDER BY
 ```
 
 ```js
-const sortOtherToEnd = Array.from(qa_testing).sort((a, b) => {
-  // Ensure "Other" is always last
-  if (a.testing_tool === "Other") return 1;
-  if (b.testing_tool === "Other") return -1;
-  // Otherwise, sort by percentage descending
-  return b.percentage - a.percentage;
-});
+function participantsPerTestingTool(data, { width }) {
+  const sortOtherToEnd = Array.from(data).sort((a, b) => {
+    // Ensure "Other" is always last
+    if (a.testing_tool === "Other") return 1;
+    if (b.testing_tool === "Other") return -1;
+    // Otherwise, sort by percentage descending
+    return b.percentage - a.percentage;
+  });
 
-const participantsPerTestingTool = Plot.plot({
-  height: 800,
-  width: 800,
-  marginLeft: 200,
-  marginBottom: 100,
-  marginRight: 50,
+  return Plot.plot({
+    title: "By Qa/Testing",
+    height: 800,
+    width: width,
+    marginLeft: 200,
+    marginBottom: 100,
+    marginRight: 50,
 
-  x: {
-    label: "Percentage of participants",
-  },
-  y: {
-    label: "Testing Tool",
-    grid: true,
-    domain: sortOtherToEnd.map((d) => d.testing_tool),
-  },
+    x: {
+      label: "Percentage of participants",
+    },
+    y: {
+      label: "Testing Tool",
+      grid: true,
+      domain: sortOtherToEnd.map((d) => d.testing_tool),
+    },
 
-  marks: [
-    Plot.barX(qa_testing, {
-      y: "testing_tool",
-      x: "percentage",
-      fill: (d) => (d.testing_tool === "Other" ? "#EFB118" : "#4269D0"),
-      sort: { y: "-x" },
-      tip: true,
-    }),
-  ],
-});
-
-display(participantsPerTestingTool);
+    marks: [
+      Plot.barX(data, {
+        y: "testing_tool",
+        x: "percentage",
+        fill: (d) => (d.testing_tool === "Other" ? "#EFB118" : "#4269D0"),
+        sort: { y: "-x" },
+        tip: true,
+      }),
+    ],
+  });
+}
 ```
-
-### By AI use
 
 ```sql id=ia_use
 
@@ -389,39 +410,40 @@ GROUP BY que_tanto_estas_usando_copilotchatgpt_u_otras_herramientas_de_ia_para_t
 ```
 
 ```js
-const iaUse = Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 100,
-  marginRight: 100,
-  x: {
-    label: "Amount of participants",
-  },
-  y: {
-    label: "AI use",
-  },
+function iaUse(data, { width }) {
+  return Plot.plot({
+    title: "By AI use",
+    height: 400,
+    width: width,
+    marginLeft: 100,
+    marginRight: 100,
+    x: {
+      label: "Amount of participants",
+    },
+    y: {
+      label: "AI use",
+    },
 
-  marks: [
-    Plot.barX(ia_use, {
-      x: "percentage",
-      y: "ia_use",
-      sort: { y: "-x" },
-      tip: true,
-    }),
+    marks: [
+      Plot.barX(data, {
+        x: "percentage",
+        y: "ia_use",
+        sort: { y: "-x" },
+        tip: true,
+      }),
 
-    Plot.text(ia_use, {
-      x: "percentage",
-      y: "ia_use",
-      text: (d) => `${d.percentage}%`,
-      dx: 40,
-      align: "left",
-      baseline: "middle",
-      color: "black",
-      font: "Arial",
-      fontSize: 12,
-    }),
-  ],
-});
-
-display(iaUse);
+      Plot.text(data, {
+        x: "percentage",
+        y: "ia_use",
+        text: (d) => `${d.percentage}%`,
+        dx: 40,
+        align: "left",
+        baseline: "middle",
+        color: "black",
+        font: "Arial",
+        fontSize: 12,
+      }),
+    ],
+  });
+}
 ```
