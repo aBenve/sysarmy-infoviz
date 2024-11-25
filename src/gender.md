@@ -1,24 +1,23 @@
 ---
 title: Gender
-sql: 
-  db: ./data/2024-01.csv 
-  historic: ./data/historic.csv 
+sql:
+  db: ./data/2024-01.csv
+  historic: ./data/historic.csv
 ---
 
 ```js
 var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 ```
 
-
 ### By Gender identity
 
-```sql id=gender_identity 
+```sql id=gender_identity
 
 
 WITH gender As (
 SELECT
-  genero AS gender, 
-  COUNT(*) AS total_count, 
+  genero AS gender,
+  COUNT(*) AS total_count,
   ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
 FROM "db"
 GROUP BY genero
@@ -33,27 +32,37 @@ ORDER BY percentage DESC
 
 ```
 
-```js 
-
+```js
 const salaryDistribution = Plot.plot({
   height: 400,
-  width: 800,   
+  width: 800,
   marginLeft: 200,
-  marginRight: 100,    
+  marginRight: 100,
   x: {
-    label: "Amount of participants"
+    label: "Amount of participants",
   },
   y: {
-    label: "Region"
+    label: "Region",
   },
   marks: [
-    Plot.barX(gender_identity, {x: "percentage", y: "gender", sort: {y: "-x"}, tip: true, title: d => `Total count: ${d.total_count}`}),
-    Plot.text(gender_identity, {x: "percentage", y: "gender", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
-  ]
-})
+    Plot.barX(gender_identity, {
+      x: "percentage",
+      y: "gender",
+      sort: { y: "-x" },
+      tip: true,
+      title: (d) => `Total count: ${d.total_count}`,
+    }),
+    Plot.text(gender_identity, {
+      x: "percentage",
+      y: "gender",
+      text: (d) => `${d.percentage.toFixed(2)} %`,
+      dx: 30,
+      textAnchor: "middle",
+    }),
+  ],
+});
 
-
-display(salaryDistribution)
+display(salaryDistribution);
 ```
 
 Claramente los Hombre Cis y Mujeres Cis son la mayoria de los participantes, asi que vamos a tener en cuenta solo estos a partir de ahora.
@@ -67,7 +76,7 @@ SELECT
   genero AS gender,
   median(ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos) AS average_salary,
   seniority,
-  COUNT(*) AS total_count, 
+  COUNT(*) AS total_count,
   ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
 FROM "db"
 GROUP BY genero, seniority
@@ -81,18 +90,17 @@ ORDER BY percentage DESC
 ```
 
 ```js
-
 const salaryDistribution = Plot.plot({
   height: 400,
-  width: 800,   
+  width: 800,
   marginLeft: 200,
-  marginRight: 100,    
+  marginRight: 100,
   x: {
     label: "Median Salary",
     tickFormat: apesos,
   },
   y: {
-    label: "Region"
+    label: "Region",
   },
   color: {
     legend: true,
@@ -102,31 +110,28 @@ const salaryDistribution = Plot.plot({
   },
   marks: [
     Plot.barX(wage_gap, {
-        x: "average_salary",
-        y: "gender",
-        fy: "seniority", //TODO: lo sacamos?
-        fill: "seniority",
-        sort: { y: "-x" },
-        tip: {
-          format: {
-            x: apesos
-          }
-        }
+      x: "average_salary",
+      y: "gender",
+      fy: "seniority", //TODO: lo sacamos?
+      fill: "seniority",
+      sort: { y: "-x" },
+      tip: {
+        format: {
+          x: apesos,
+        },
+      },
     }),
-  ]
-})
+  ],
+});
 
-display(salaryDistribution)
-
+display(salaryDistribution);
 ```
 
 ### Historic pacticipation
 
-
-
 ```sql id=historic_participation
 WITH all_historic_participation as (
-  select genero as gender, fecha as date, count(*) as count, 
+  select genero as gender, fecha as date, count(*) as count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
   from historic
   group by genero, fecha
@@ -146,48 +151,57 @@ order by date
 ```
 
 ```js
-const historicParticipationFixed = Array.from(historic_participation).map(o => ({
-  date: new Date(o.date),
-  gender: o.gender,
-  count: o.count
-}));
+const historicParticipationFixed = Array.from(historic_participation).map(
+  (o) => ({
+    date: new Date(o.date),
+    gender: o.gender,
+    count: o.count,
+  })
+);
 
-display(Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 150,
-  marginRight: 100,
-  y: {
-    label: "Participation (%)",
-    percent: true
-  },
-  color: {
-    legend: true,
-    label: "Gender",
-    scheme: "Observable10",
-  },
-  marks: [
-    Plot.areaY(historicParticipationFixed,
-      Plot.stackY(
-        {
-          offset: "normalize", order: "count", reverse:true
-        },
-        {
-          x: "date", y: "count", tip: true,
-          fill: "gender"
-        }
-      )
-    ),
-    Plot.ruleY([0, 1])
-  ]
-}))
+display(
+  Plot.plot({
+    height: 400,
+    width: 800,
+    marginLeft: 150,
+    marginRight: 100,
+    y: {
+      label: "Participation (%)",
+      percent: true,
+    },
+    color: {
+      legend: true,
+      label: "Gender",
+      scheme: "Observable10",
+    },
+    marks: [
+      Plot.areaY(
+        historicParticipationFixed,
+        Plot.stackY(
+          {
+            offset: "normalize",
+            order: "count",
+            reverse: true,
+          },
+          {
+            x: "date",
+            y: "count",
+            tip: true,
+            fill: "gender",
+          }
+        )
+      ),
+      Plot.ruleY([0, 1]),
+    ],
+  })
+);
 ```
 
 ### Historic salaries
 
 ```sql id=historic_salaries
 WITH all_historic_salaries as (
-  select genero as gender, fecha as date, array_agg(salario) as salary_sum, count(*) as count, 
+  select genero as gender, fecha as date, array_agg(salario) as salary_sum, count(*) as count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
   from historic
   group by genero, fecha
@@ -210,50 +224,49 @@ from
 order by date
 ```
 
-
 ```js
-
-const historicSalariesFixed = Array.from(historic_salaries).map(o => ({
+const historicSalariesFixed = Array.from(historic_salaries).map((o) => ({
   date: new Date(o.date),
   gender: o.gender,
-  salary: o.salary
+  salary: o.salary,
 }));
 
-display(Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 150,
-  marginRight: 100,
-  y: {
-    label: "Salary",
-    tickFormat: apesos,
-  },
-  color: {
-    legend: true,
-    label: "Gender",
-    scheme: "Observable10",
-  },
-  marks: [
-    Plot.lineY(historicSalariesFixed,
-      {
-        x: "date", y: "salary",
+display(
+  Plot.plot({
+    height: 400,
+    width: 800,
+    marginLeft: 150,
+    marginRight: 100,
+    y: {
+      label: "Salary",
+      tickFormat: apesos,
+    },
+    color: {
+      legend: true,
+      label: "Gender",
+      scheme: "Observable10",
+    },
+    marks: [
+      Plot.lineY(historicSalariesFixed, {
+        x: "date",
+        y: "salary",
         stroke: "gender",
         tip: {
           format: {
-            y: apesos
-          }
+            y: apesos,
+          },
         },
-      }
-    ),
-  ]
-}))
+      }),
+    ],
+  })
+);
 ```
 
 ### Historic accordance
 
 ```sql id=historic_accordance
 WITH all_historic_accordance as (
-  select genero as gender, fecha as date, array_agg(conformidad::int) as conformities, count(*) as count, 
+  select genero as gender, fecha as date, array_agg(conformidad::int) as conformities, count(*) as count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
   from historic
   group by genero, fecha
@@ -276,40 +289,39 @@ from
 order by date
 ```
 
-
 ```js
-
-
-const historicAccordanceFixed = Array.from(historic_accordance).map(o => ({
+const historicAccordanceFixed = Array.from(historic_accordance).map((o) => ({
   date: new Date(o.date),
   gender: o.gender,
-  conformity: o.conformity
+  conformity: o.conformity,
 }));
 
-display(Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 150,
-  marginRight: 100,
-  y: {
-    label: "Accordance",
-    domain: [0, 5],
-  },
-  color: {
-    legend: true,
-    label: "Gender",
-    scheme: "Observable10",
-  },
-  marks: [
-    Plot.lineY(historicAccordanceFixed,
-      {
-        x: "date", y: "conformity", tip: true,
+display(
+  Plot.plot({
+    height: 400,
+    width: 800,
+    marginLeft: 150,
+    marginRight: 100,
+    y: {
+      label: "Accordance",
+      domain: [0, 5],
+    },
+    color: {
+      legend: true,
+      label: "Gender",
+      scheme: "Observable10",
+    },
+    marks: [
+      Plot.lineY(historicAccordanceFixed, {
+        x: "date",
+        y: "conformity",
+        tip: true,
         stroke: "gender",
-        curve: "natural"
-      }
-    ),
-  ]
-}))
+        curve: "natural",
+      }),
+    ],
+  })
+);
 ```
 
 ### By studies and completition
@@ -336,17 +348,16 @@ ORDER BY education_level, education_status
 ```
 
 ```js
-
 const studiesCompletionChart = Plot.plot({
   height: 400,
   width: 800,
   marginLeft: 150,
   marginRight: 100,
   x: {
-    label: "Percentage"
+    label: "Percentage",
   },
   y: {
-    label: "Education Level"
+    label: "Education Level",
   },
   color: {
     legend: true,
@@ -361,13 +372,13 @@ const studiesCompletionChart = Plot.plot({
       fy: "gender",
       fill: "education_status",
       sort: { y: "-x" },
-      tip: true, title: d => `Total count: ${d.total_count}`
+      tip: true,
+      title: (d) => `Total count: ${d.total_count}`,
     }),
-  ]
-})
+  ],
+});
 
-display(studiesCompletionChart)
-
+display(studiesCompletionChart);
 ```
 
 ### Salaries by experience
@@ -393,15 +404,14 @@ ORDER BY experience DESC
 
 ```
 
-```js 
-
+```js
 const studiesLineChart = Plot.plot({
   height: 400,
   width: 800,
   marginLeft: 100,
   marginRight: 100,
   x: {
-    label: "Experience"
+    label: "Experience",
   },
   y: {
     label: "Median Salary",
@@ -414,22 +424,28 @@ const studiesLineChart = Plot.plot({
   },
 
   marks: [
-    Plot.line(studies, {x: "experience", y: "average_salary", stroke: "gender", curve: "natural"}),
+    Plot.line(studies, {
+      x: "experience",
+      y: "average_salary",
+      stroke: "gender",
+      curve: "natural",
+    }),
     Plot.dot(studies, {
-      x: "experience", y: "average_salary", fill: "gender", r: 5,
+      x: "experience",
+      y: "average_salary",
+      fill: "gender",
+      r: 5,
       tip: {
         format: {
-          y: apesos
-        }
+          y: apesos,
+        },
       },
       // title: d => `Median Salary: ${d.average_salary}`
-    })
-  ]
-})
+    }),
+  ],
+});
 
-display(studiesLineChart)
-
-
+display(studiesLineChart);
 ```
 
 ### Participation by experience
@@ -439,14 +455,14 @@ WITH all_experience_participation AS (
 SELECT
   genero AS gender,
   min(anos_de_experiencia) as experience_min,
-  CASE 
+  CASE
     WHEN anos_de_experiencia BETWEEN 0 AND 1 THEN '0-1'
     WHEN anos_de_experiencia BETWEEN 2 AND 3 THEN '2-3'
     WHEN anos_de_experiencia BETWEEN 4 AND 5 THEN '4-5'
     WHEN anos_de_experiencia BETWEEN 6 AND 7 THEN '6-7'
     WHEN anos_de_experiencia BETWEEN 8 AND 9 THEN '8-9'
     WHEN anos_de_experiencia BETWEEN 10 AND 15 THEN '10-15'
-    ELSE '15+'        
+    ELSE '15+'
   END AS experience_bin,
   COUNT(*) AS total_count,
   ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (PARTITION BY genero)) * 100, 3) AS percentage
@@ -462,48 +478,55 @@ ORDER BY experience_min
 ```
 
 ```js
-const experienceParticipationFixed = Array.from(experience_participation).map(o => ({
-  experience_bin: o.experience_bin,
-  experience_min: o.experience_min,
-  gender: o.gender,
-  total_count: o.total_count
-}));
+const experienceParticipationFixed = Array.from(experience_participation).map(
+  (o) => ({
+    experience_bin: o.experience_bin,
+    experience_min: o.experience_min,
+    gender: o.gender,
+    total_count: o.total_count,
+  })
+);
 
-display(Plot.plot({
-  height: 400,
-  width: 800,
-  marginLeft: 150,
-  marginRight: 100,
-  x: {
-    label: "Experience Bin",
-    domain: ['0-1', '2-3', '4-5', '6-7', '8-9', '10-15', "15+"]
-  },
-  y: {
-    label: "Participation (%)",
-    percent: true
-  },
-  color: {
-    legend: true,
-    label: "Gender",
-    scheme: "Observable10",
-  },
-  marks: [
-    Plot.areaY(experienceParticipationFixed,
-      Plot.stackY(
-        {
-          offset: "normalize", order: "experience_min"
-        },
-        {
-          x: "experience_bin", y: "total_count", tip: true,
-          fill: "gender"
-        }
-      )
-    ),
-    Plot.ruleY([0, 1])
-  ]
-}))
+display(
+  Plot.plot({
+    height: 400,
+    width: 800,
+    marginLeft: 150,
+    marginRight: 100,
+    x: {
+      label: "Experience Bin",
+      domain: ["0-1", "2-3", "4-5", "6-7", "8-9", "10-15", "15+"],
+    },
+    y: {
+      label: "Participation (%)",
+      percent: true,
+    },
+    color: {
+      legend: true,
+      label: "Gender",
+      scheme: "Observable10",
+    },
+    marks: [
+      Plot.areaY(
+        experienceParticipationFixed,
+        Plot.stackY(
+          {
+            offset: "normalize",
+            order: "experience_min",
+          },
+          {
+            x: "experience_bin",
+            y: "total_count",
+            tip: true,
+            fill: "gender",
+          }
+        )
+      ),
+      Plot.ruleY([0, 1]),
+    ],
+  })
+);
 ```
-
 
 ### By accordance
 
@@ -512,14 +535,14 @@ WITH accordance AS (
 SELECT
   genero AS gender,
   AVG(que_tan_conforme_estas_con_tus_ingresos_laborales) AS accordance_level,
-  CASE 
+  CASE
     WHEN anos_de_experiencia BETWEEN 0 AND 1 THEN '0-1'
     WHEN anos_de_experiencia BETWEEN 2 AND 3 THEN '2-3'
     WHEN anos_de_experiencia BETWEEN 4 AND 5 THEN '4-5'
     WHEN anos_de_experiencia BETWEEN 6 AND 7 THEN '6-7'
     WHEN anos_de_experiencia BETWEEN 8 AND 9 THEN '8-9'
     WHEN anos_de_experiencia BETWEEN 10 AND 15 THEN '10-15'
-    ELSE '15+'        
+    ELSE '15+'
 
   END AS experience_bin,
   COUNT(*) AS total_count,
@@ -532,7 +555,7 @@ GROUP BY genero, experience_bin
 SELECT *
 FROM accordance
 WHERE percentage > 1
-ORDER BY CASE 
+ORDER BY CASE
       WHEN experience_bin = '0-1' THEN 1
       WHEN experience_bin = '2-3' THEN 2
       WHEN experience_bin = '4-5' THEN 3
@@ -545,7 +568,6 @@ ORDER BY CASE
 ```
 
 ```js
-
 const accordanceChart = Plot.plot({
   height: 400,
   width: 800,
@@ -553,7 +575,7 @@ const accordanceChart = Plot.plot({
   marginRight: 100,
   x: {
     label: "Experience Bin",
-    domain: ['0-1', '2-3', '4-5', '6-7', '8-9', '10-15', "15+"]
+    domain: ["0-1", "2-3", "4-5", "6-7", "8-9", "10-15", "15+"],
   },
   y: {
     label: "Accordance Level",
@@ -571,7 +593,7 @@ const accordanceChart = Plot.plot({
       y: "accordance_level",
       stroke: "gender",
       curve: "natural",
-        tip: true
+      tip: true,
     }),
     Plot.dot(accordance, {
       x: "experience_bin",
@@ -579,12 +601,9 @@ const accordanceChart = Plot.plot({
       r: "percentage",
       fill: "gender",
       r: 5,
+    }),
+  ],
+});
 
-    })
-  ]
-})
-
-display(accordanceChart)
-
+display(accordanceChart);
 ```
-

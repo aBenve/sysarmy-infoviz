@@ -1,7 +1,7 @@
 ---
 title: Salaries
-sql: 
-  db: ./data/2024-01.csv 
+sql:
+  db: ./data/2024-01.csv
   historic: ./data/historic.csv
 ---
 
@@ -13,7 +13,7 @@ var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
 ```sql id=salary_per_semester
 
-SELECT 
+SELECT
     median(salario) AS mean_salary,
     fecha AS date
 FROM historic
@@ -22,7 +22,10 @@ GROUP BY date;
 ```
 
 ```js
-let salaryPerSemesterFixed = Array.from(salary_per_semester).map(o => ({date: new Date(o.date), mean_salary: o.mean_salary}))
+let salaryPerSemesterFixed = Array.from(salary_per_semester).map((o) => ({
+  date: new Date(o.date),
+  mean_salary: o.mean_salary,
+}));
 const salaryBySemester = Plot.plot({
   height: 400,
   width: 800,
@@ -39,41 +42,41 @@ const salaryBySemester = Plot.plot({
 
   marks: [
     Plot.line(salaryPerSemesterFixed, {
-      x: "date", 
+      x: "date",
       y: "mean_salary",
       tip: {
         format: {
-          y: apesos
-        }
+          y: apesos,
+        },
       },
     }),
-  ]
+  ],
 });
-
 
 display(salaryBySemester);
 ```
 
 ### By contract type and experience
+
 This explains the difference in salaries if it is in dollars or pesos, and the difference in salaries in relation with the experience.
 
 ```sql id=salary_per_contract
 
 WITH categorized_salaries AS (
-    SELECT 
+    SELECT
         seniority,
-        CASE 
+        CASE
             WHEN si_tu_sueldo_esta_dolarizado_cual_fue_el_ultimo_valor_del_dolar_que_tomaron IS NOT NULL THEN 'dolarized'
             ELSE 'not dolarized'
         END AS salary_type,
         ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
     FROM "db"
-    WHERE 
+    WHERE
         ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
         AND seniority IS NOT NULL
 ),
 ranked_salaries AS (
-    SELECT 
+    SELECT
         seniority,
         salary_type,
         salary,
@@ -81,20 +84,19 @@ ranked_salaries AS (
         COUNT(*) OVER (PARTITION BY seniority, salary_type) AS total_count
     FROM categorized_salaries
 )
-SELECT 
+SELECT
     seniority,
     salary_type,
     median(salary) AS median_salary
 FROM ranked_salaries
-WHERE 
-    row_num IN ((total_count + 1) / 2, (total_count + 2) / 2) 
+WHERE
+    row_num IN ((total_count + 1) / 2, (total_count + 2) / 2)
 GROUP BY seniority, salary_type
 ORDER BY seniority, salary_type;
 
 ```
 
 ```js
-
 const salaryPerContract = Plot.plot({
   height: 400,
   width: 800,
@@ -109,41 +111,38 @@ const salaryPerContract = Plot.plot({
     label: "Contract type",
   },
 
-  fy:{
+  fy: {
     label: "Salary type",
     domain: ["Junior", "Semi-Senior", "Senior"],
-    },
+  },
   marks: [
-    Plot.barX(salary_per_contract, { 
-      x: "median_salary", 
-      y: "salary_type", 
+    Plot.barX(salary_per_contract, {
+      x: "median_salary",
+      y: "salary_type",
       fy: "seniority",
       fill: "seniority",
       tip: {
         format: {
-          x: apesos
-        }
-      }
+          x: apesos,
+        },
+      },
     }),
-  
-  ]
+  ],
 });
-
 
 display(salaryPerContract);
 ```
-
 
 ### By job title and experience
 
 ```sql id=salary_per_job_title
 WITH categorized_salaries AS (
-    SELECT 
+    SELECT
         seniority,
         trabajo_de AS job_title,
         ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
     FROM "db"
-    WHERE 
+    WHERE
         ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
         AND seniority IS NOT NULL
         AND trabajo_de IS NOT NULL
@@ -151,7 +150,7 @@ WITH categorized_salaries AS (
 
 
 ranked_salaries AS (
-    SELECT 
+    SELECT
         seniority,
         job_title,
         salary,
@@ -160,12 +159,12 @@ ranked_salaries AS (
     FROM categorized_salaries
 )
 
-SELECT 
+SELECT
     seniority,
     job_title,
     median(salary) AS median_salary
 FROM ranked_salaries
-WHERE 
+WHERE
     total_count > 10
 GROUP BY seniority, job_title
 ORDER BY seniority, job_title;
@@ -173,7 +172,6 @@ ORDER BY seniority, job_title;
 ```
 
 ```js
-
 const salaryPerJobTitle = Plot.plot({
   height: 1000,
   width: 1000,
@@ -200,38 +198,38 @@ const salaryPerJobTitle = Plot.plot({
   marks: [
     Plot.barX(salary_per_job_title, {
       y: "seniority",
-      x: "median_salary", 
+      x: "median_salary",
       fy: "job_title",
       fill: "seniority",
       title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
-      sort: { y: "-x",  },
-      tip: true
+      sort: { y: "-x" },
+      tip: true,
     }),
-    Plot.axisY({ticks: []}),
+    Plot.axisY({ ticks: [] }),
   ],
 });
 
-
 display(salaryPerJobTitle);
 ```
+
 ### By education and contract type
 
 ```sql id=salary_per_education_contract
 WITH categorized_salaries AS (
-  SELECT 
+  SELECT
     maximo_nivel_de_estudios AS education_level,
-    CASE 
+    CASE
       WHEN si_tu_sueldo_esta_dolarizado_cual_fue_el_ultimo_valor_del_dolar_que_tomaron IS NOT NULL THEN 'dolarized'
       ELSE 'not dolarized'
     END AS salary_type,
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
-  WHERE 
+  WHERE
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND maximo_nivel_de_estudios IS NOT NULL
 ),
 ranked_salaries AS (
-  SELECT 
+  SELECT
     education_level,
     salary_type,
     salary,
@@ -239,7 +237,7 @@ ranked_salaries AS (
     COUNT(*) OVER (PARTITION BY education_level, salary_type) AS total_count
   FROM categorized_salaries
 )
-SELECT 
+SELECT
   education_level,
   salary_type,
   median(salary) AS median_salary,
@@ -267,22 +265,22 @@ const salaryPerEducationContract = Plot.plot({
   },
 
   fy: {
-  label: "Salary type",
-  domain: ["dolarized", "not dolarized"],
+    label: "Salary type",
+    domain: ["dolarized", "not dolarized"],
   },
   marks: [
-  Plot.barX(salary_per_education_contract, { 
-    x: "median_salary", 
-    y: "education_level", 
-    fy: "salary_type",
-    // fill: "salary_type",
-    tip: {
-      format: {
-        x: apesos
-      }
-    }
-  }),
-  ]
+    Plot.barX(salary_per_education_contract, {
+      x: "median_salary",
+      y: "education_level",
+      fy: "salary_type",
+      // fill: "salary_type",
+      tip: {
+        format: {
+          x: apesos,
+        },
+      },
+    }),
+  ],
 });
 
 display(salaryPerEducationContract);
@@ -292,18 +290,18 @@ display(salaryPerEducationContract);
 
 ```sql id=salary_per_career_experience
 WITH categorized_salaries AS (
-  SELECT 
+  SELECT
     seniority,
     carrera AS career,
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
-  WHERE 
+  WHERE
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND seniority IS NOT NULL
     AND carrera IS NOT NULL
 ),
 ranked_salaries AS (
-  SELECT 
+  SELECT
     seniority,
     career,
     salary,
@@ -311,12 +309,12 @@ ranked_salaries AS (
     COUNT(*) OVER (PARTITION BY seniority, career) AS total_count
   FROM categorized_salaries
 )
-SELECT 
+SELECT
   seniority,
   career,
   median(salary) AS median_salary
 FROM ranked_salaries
-WHERE 
+WHERE
     total_count > 10
 GROUP BY seniority, career
 ORDER BY seniority, career;
@@ -335,7 +333,7 @@ const salaryPerCareerExperience = Plot.plot({
     tickFormat: apesos,
   },
   y: {
-    label: null
+    label: null,
   },
   fy: {
     label: "Career",
@@ -350,13 +348,13 @@ const salaryPerCareerExperience = Plot.plot({
     Plot.barX(salary_per_career_experience, {
       y: "seniority",
       fy: "career",
-      x: "median_salary", 
+      x: "median_salary",
       fill: "seniority",
       title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x" },
-      tip: true
+      tip: true,
     }),
-    Plot.axisY({ticks: []}),
+    Plot.axisY({ ticks: [] }),
   ],
 });
 
@@ -367,18 +365,18 @@ display(salaryPerCareerExperience);
 
 ```sql id=salary_per_technology_experience
 WITH categorized_salaries AS (
-  SELECT 
+  SELECT
     seniority,
     UNNEST(STRING_TO_ARRAY(plataformas_que_utilizas_en_tu_puesto_actual, ','))::TEXT AS technology,
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
-  WHERE 
+  WHERE
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND seniority IS NOT NULL
     AND plataformas_que_utilizas_en_tu_puesto_actual IS NOT NULL
 ),
 ranked_salaries AS (
-  SELECT 
+  SELECT
     seniority,
     TRIM(technology) AS technology, -- Remove extra spaces
     salary,
@@ -386,12 +384,12 @@ ranked_salaries AS (
     COUNT(*) OVER (PARTITION BY seniority, TRIM(technology)) AS total_count
   FROM categorized_salaries
 )
-SELECT 
+SELECT
   seniority,
   technology,
   median(salary) AS median_salary
 FROM ranked_salaries
-WHERE 
+WHERE
     total_count > 10
 GROUP BY seniority, technology
 ORDER BY seniority, technology;
@@ -410,7 +408,7 @@ const salaryPerTechnologyExperience = Plot.plot({
   x: {
     label: "Median Salary",
     tickFormat: apesos,
-    ticks: 5
+    ticks: 5,
   },
   y: {
     label: null,
@@ -428,13 +426,13 @@ const salaryPerTechnologyExperience = Plot.plot({
     Plot.barX(salary_per_technology_experience, {
       y: "seniority",
       fy: "technology",
-      x: "median_salary", 
+      x: "median_salary",
       fill: "seniority",
       title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x" },
-      tip: true
+      tip: true,
     }),
-    Plot.axisY({ticks: []}),
+    Plot.axisY({ ticks: [] }),
   ],
 });
 
@@ -445,18 +443,18 @@ display(salaryPerTechnologyExperience);
 
 ```sql id=salary_per_language_experience
 WITH categorized_salaries AS (
-  SELECT 
+  SELECT
     seniority,
     UNNEST(STRING_TO_ARRAY(lenguajes_de_programacion_o_tecnologias_que_utilices_en_tu_puesto_actual, ','))::TEXT AS programming_language,
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos AS salary
   FROM "db"
-  WHERE 
+  WHERE
     ultimo_salario_mensual_o_retiro_bruto_en_pesos_argentinos IS NOT NULL
     AND seniority IS NOT NULL
     AND lenguajes_de_programacion_o_tecnologias_que_utilices_en_tu_puesto_actual IS NOT NULL
 ),
 ranked_salaries AS (
-  SELECT 
+  SELECT
     seniority,
     TRIM(programming_language) AS programming_language, -- Remove extra spaces
     salary,
@@ -464,12 +462,12 @@ ranked_salaries AS (
     COUNT(*) OVER (PARTITION BY seniority, TRIM(programming_language)) AS total_count
   FROM categorized_salaries
 )
-SELECT 
+SELECT
   seniority,
   programming_language,
   median(salary) AS median_salary
 FROM ranked_salaries
-WHERE 
+WHERE
     total_count > 10
 GROUP BY seniority, programming_language
 ORDER BY seniority, programming_language;
@@ -505,13 +503,13 @@ const salaryPerLanguageExperience = Plot.plot({
     Plot.barX(salary_per_language_experience, {
       y: "seniority",
       fy: "programming_language",
-      x: "median_salary", 
+      x: "median_salary",
       fill: "seniority",
       title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x" },
-      tip: true
+      tip: true,
     }),
-    Plot.axisY({ticks: []}),
+    Plot.axisY({ ticks: [] }),
   ],
 });
 

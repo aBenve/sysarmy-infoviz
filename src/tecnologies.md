@@ -1,9 +1,8 @@
 ---
 title: Tecnologies
-sql: 
-  db: ./data/2024-01.csv 
+sql:
+  db: ./data/2024-01.csv
 ---
-
 
 ### By platform
 
@@ -11,7 +10,7 @@ sql:
 
 WITH all_platforms AS (
   SELECT
-    LOWER(TRIM(platform)) AS platform, 
+    LOWER(TRIM(platform)) AS platform,
     COUNT(*) AS total_count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
   FROM (
@@ -19,7 +18,7 @@ WITH all_platforms AS (
     FROM "db"
     WHERE plataformas_que_utilizas_en_tu_puesto_actual IS NOT NULL
   ) AS normalized_platforms
-  WHERE platform != '' 
+  WHERE platform != ''
   GROUP BY LOWER(TRIM(platform))
 ),
 
@@ -35,13 +34,12 @@ filtered_platforms AS (
 
 SELECT *
 FROM filtered_platforms
-ORDER BY 
-  CASE WHEN platform = 'Other' THEN 1 ELSE 0 END, 
+ORDER BY
+  CASE WHEN platform = 'Other' THEN 1 ELSE 0 END,
   percentage DESC;
 ```
 
 ```js
-
 const sortOtherToEnd = Array.from(platforms).sort((a, b) => {
   // Ensure "Other" is always last
   if (a.platform === "Other") return 1;
@@ -63,22 +61,21 @@ const participantsPerPlatform = Plot.plot({
   y: {
     label: "Platform",
     grid: true,
-    domain: sortOtherToEnd.map(d => d.platform) // Use sorted order for roles
+    domain: sortOtherToEnd.map((d) => d.platform), // Use sorted order for roles
   },
 
   marks: [
     Plot.barX(platforms, {
       y: "platform",
-      x: "percentage", 
-      fill: (d) => d.platform === "Other" ? "#EFB118" : "#4269D0",
+      x: "percentage",
+      fill: (d) => (d.platform === "Other" ? "#EFB118" : "#4269D0"),
       sort: { y: "-x" },
-      tip: true
+      tip: true,
     }),
   ],
 });
 
 display(participantsPerPlatform);
-
 ```
 
 ### By programming language
@@ -87,7 +84,7 @@ display(participantsPerPlatform);
 
 WITH all_languages AS (
   SELECT
-    LOWER(TRIM(language)) AS language, 
+    LOWER(TRIM(language)) AS language,
     COUNT(*) AS total_count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
   FROM (
@@ -112,13 +109,12 @@ filtered_languages AS (
 SELECT *
 
 FROM filtered_languages
-ORDER BY 
-  CASE WHEN language = 'Other' THEN 1 ELSE 0 END, 
+ORDER BY
+  CASE WHEN language = 'Other' THEN 1 ELSE 0 END,
   percentage DESC;
 ```
 
 ```js
-
 const sortOtherToEnd = Array.from(programming_languages).sort((a, b) => {
   // Ensure "Other" is always last
   if (a.language === "Other") return 1;
@@ -140,30 +136,30 @@ const participantsPerLanguage = Plot.plot({
   y: {
     label: "Language",
     grid: true,
-    domain: sortOtherToEnd.map(d => d.language)
+    domain: sortOtherToEnd.map((d) => d.language),
   },
 
   marks: [
-      Plot.barX(programming_languages, {
-        y: "language",
-        x: "percentage", 
-        fill: (d) => d.language === "Other" ? "#EFB118" : "#4269D0",
-        sort: { y: "-x" },
-        tip: true
-      }),
+    Plot.barX(programming_languages, {
+      y: "language",
+      x: "percentage",
+      fill: (d) => (d.language === "Other" ? "#EFB118" : "#4269D0"),
+      sort: { y: "-x" },
+      tip: true,
+    }),
   ],
 });
 
 display(participantsPerLanguage);
-
 ```
+
 ### By framework, tools and libraries
 
 ```sql id=frameworks_tools_libraries
 
 WITH all_frameworks AS (
   SELECT
-    LOWER(TRIM(framework)) AS framework, 
+    LOWER(TRIM(framework)) AS framework,
     COUNT(*) AS total_count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
   FROM (
@@ -187,14 +183,12 @@ filtered_frameworks AS (
 
 SELECT *
 FROM filtered_frameworks
-ORDER BY 
-  CASE WHEN framework = 'Other' THEN 1 ELSE 0 END, 
+ORDER BY
+  CASE WHEN framework = 'Other' THEN 1 ELSE 0 END,
   percentage DESC;
 ```
 
 ```js
-
-
 const sortOtherToEnd = Array.from(frameworks_tools_libraries).sort((a, b) => {
   // Ensure "Other" is always last
   if (a.framework === "Other") return 1;
@@ -202,7 +196,6 @@ const sortOtherToEnd = Array.from(frameworks_tools_libraries).sort((a, b) => {
   // Otherwise, sort by percentage descending
   return b.percentage - a.percentage;
 });
-
 
 const participantsPerFramework = Plot.plot({
   height: 800,
@@ -217,22 +210,21 @@ const participantsPerFramework = Plot.plot({
   y: {
     label: "Framework",
     grid: true,
-    domain: sortOtherToEnd.map(d => d.framework)
+    domain: sortOtherToEnd.map((d) => d.framework),
   },
 
   marks: [
-      Plot.barX(frameworks_tools_libraries, {
-        y: "framework",
-        x: "percentage", 
-        fill: (d) => d.framework === "Other" ? "#EFB118" : "#4269D0",
-        sort: { y: "-x" },
-        tip: true
-      }),
+    Plot.barX(frameworks_tools_libraries, {
+      y: "framework",
+      x: "percentage",
+      fill: (d) => (d.framework === "Other" ? "#EFB118" : "#4269D0"),
+      sort: { y: "-x" },
+      tip: true,
+    }),
   ],
 });
 
 display(participantsPerFramework);
-
 ```
 
 ### By data bases
@@ -241,7 +233,7 @@ display(participantsPerFramework);
 
 WITH all_databases AS (
   SELECT
-    LOWER(TRIM(database)) AS database, 
+    LOWER(TRIM(database)) AS database,
     COUNT(*) AS total_count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
   FROM (
@@ -265,14 +257,12 @@ filtered_databases AS (
 
 SELECT *
 FROM filtered_databases
-ORDER BY 
-  CASE WHEN database = 'Other' THEN 1 ELSE 0 END, 
+ORDER BY
+  CASE WHEN database = 'Other' THEN 1 ELSE 0 END,
   percentage DESC;
 ```
 
 ```js
-
-
 const sortOtherToEnd = Array.from(databases).sort((a, b) => {
   // Ensure "Other" is always last
   if (a.database === "Other") return 1;
@@ -280,8 +270,6 @@ const sortOtherToEnd = Array.from(databases).sort((a, b) => {
   // Otherwise, sort by percentage descending
   return b.percentage - a.percentage;
 });
-
-
 
 const participantsPerDatabase = Plot.plot({
   height: 800,
@@ -296,22 +284,21 @@ const participantsPerDatabase = Plot.plot({
   y: {
     label: "Database",
     grid: true,
-    domain: sortOtherToEnd.map(d => d.database)
+    domain: sortOtherToEnd.map((d) => d.database),
   },
 
   marks: [
-      Plot.barX(databases, {
-        y: "database",
-        x: "percentage", 
-        fill: (d) => d.database === "Other" ? "#EFB118" : "#4269D0",
-        sort: { y: "-x" },
-        tip: true
-      }),
+    Plot.barX(databases, {
+      y: "database",
+      x: "percentage",
+      fill: (d) => (d.database === "Other" ? "#EFB118" : "#4269D0"),
+      sort: { y: "-x" },
+      tip: true,
+    }),
   ],
 });
 
 display(participantsPerDatabase);
-
 ```
 
 ### By Qa/Testing
@@ -320,7 +307,7 @@ display(participantsPerDatabase);
 
 WITH all_testing_tools AS (
   SELECT
-    LOWER(TRIM(testing_tool)) AS testing_tool, 
+    LOWER(TRIM(testing_tool)) AS testing_tool,
     COUNT(*) AS total_count,
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
   FROM (
@@ -344,13 +331,12 @@ filtered_testing_tools AS (
 
 SELECT *
 FROM filtered_testing_tools
-ORDER BY 
-  CASE WHEN testing_tool = 'Other' THEN 1 ELSE 0 END, 
+ORDER BY
+  CASE WHEN testing_tool = 'Other' THEN 1 ELSE 0 END,
   percentage DESC;
 ```
 
 ```js
-
 const sortOtherToEnd = Array.from(qa_testing).sort((a, b) => {
   // Ensure "Other" is always last
   if (a.testing_tool === "Other") return 1;
@@ -367,34 +353,33 @@ const participantsPerTestingTool = Plot.plot({
   marginRight: 50,
 
   x: {
-      label: "Percentage of participants",
+    label: "Percentage of participants",
   },
   y: {
-  label: "Testing Tool",
-      grid: true,
-      domain: sortOtherToEnd.map(d => d.testing_tool)
+    label: "Testing Tool",
+    grid: true,
+    domain: sortOtherToEnd.map((d) => d.testing_tool),
   },
 
   marks: [
-      Plot.barX(qa_testing, {
-        y: "testing_tool",
-        x: "percentage", 
-        fill: (d) => d.testing_tool === "Other" ? "#EFB118" : "#4269D0",
-        sort: { y: "-x" },
-        tip: true
-      }),
+    Plot.barX(qa_testing, {
+      y: "testing_tool",
+      x: "percentage",
+      fill: (d) => (d.testing_tool === "Other" ? "#EFB118" : "#4269D0"),
+      sort: { y: "-x" },
+      tip: true,
+    }),
   ],
 });
 
 display(participantsPerTestingTool);
-
 ```
 
 ### By AI use
 
 ```sql id=ia_use
 
-SELECT que_tanto_estas_usando_copilotchatgpt_u_otras_herramientas_de_ia_para_tu_trabajo AS ia_use, 
+SELECT que_tanto_estas_usando_copilotchatgpt_u_otras_herramientas_de_ia_para_tu_trabajo AS ia_use,
   COUNT(*) AS total_count,
   ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 1) AS percentage
 FROM db
@@ -404,43 +389,39 @@ GROUP BY que_tanto_estas_usando_copilotchatgpt_u_otras_herramientas_de_ia_para_t
 ```
 
 ```js
-
 const iaUse = Plot.plot({
   height: 400,
-  width: 800,   
+  width: 800,
   marginLeft: 100,
-  marginRight: 100,    
+  marginRight: 100,
   x: {
-    label: "Amount of participants"
+    label: "Amount of participants",
   },
   y: {
-    label: "AI use"
+    label: "AI use",
   },
-  
+
   marks: [
     Plot.barX(ia_use, {
-        x: "percentage",
-        y: "ia_use",
-        sort: { y: "-x" },
-        tip: true
+      x: "percentage",
+      y: "ia_use",
+      sort: { y: "-x" },
+      tip: true,
     }),
 
     Plot.text(ia_use, {
       x: "percentage",
       y: "ia_use",
-      text: d => `${d.percentage}%`,
+      text: (d) => `${d.percentage}%`,
       dx: 40,
       align: "left",
       baseline: "middle",
       color: "black",
       font: "Arial",
-      fontSize: 12
-    })
-  ]
-})
+      fontSize: 12,
+    }),
+  ],
+});
 
-
-display(iaUse)
-
+display(iaUse);
 ```
-

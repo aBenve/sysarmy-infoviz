@@ -1,7 +1,7 @@
 ---
 toc: false
-sql: 
-  db: ./data/2024-01.csv 
+sql:
+  db: ./data/2024-01.csv
 ---
 
 <div class="hero">
@@ -9,12 +9,9 @@ sql:
   <span>This is a clone of the sysarmy salary survey 2024 with Observable Framework</span>
 </div>
 
-
-
-
 ```sql
 
-select * 
+select *
 from "db"
 
 ```
@@ -25,7 +22,6 @@ SELECT donde_estas_trabajando
 FROM "db"
 
 ```
-
 
 <!-- This styles seems to be global -->
 
