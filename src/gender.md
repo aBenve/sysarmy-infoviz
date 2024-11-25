@@ -178,13 +178,13 @@ display(Plot.plot({
 
 ```sql id=historic_salaries
 WITH all_historic_salaries as (
-  select genero as gender, fecha as date, sum(salario) as salary_sum, count(*) as count, 
+  select genero as gender, fecha as date, array_agg(salario) as salary_sum, count(*) as count, 
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
   from historic
   group by genero, fecha
 )
 
-SELECT gender, date, salary_sum / count as salary
+SELECT gender, date, list_median(salary_sum) as salary
 from
 (
     select *
@@ -192,7 +192,7 @@ from
     WHERE percentage >= 1
     UNION ALL
     (
-        SELECT 'Other' AS gender, date, SUM(salary_sum) AS salary_sum, SUM(count)::int AS count, SUM(percentage) AS percentage
+        SELECT 'Other' AS gender, date, flatten(array_agg(salary_sum)) AS salary_sum, SUM(count)::int AS count, SUM(percentage) AS percentage
         FROM all_historic_salaries
         WHERE percentage < 1
         group by date
@@ -238,13 +238,13 @@ display(Plot.plot({
 
 ```sql id=historic_accordance
 WITH all_historic_accordance as (
-  select genero as gender, fecha as date, sum(conformidad) as conformity_sum, count(*) as count, 
+  select genero as gender, fecha as date, array_agg(conformidad::int) as conformities, count(*) as count, 
     ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER (partition by fecha)) * 100, 3) AS percentage
   from historic
   group by genero, fecha
 )
 
-SELECT gender, date, conformity_sum / count as conformity
+SELECT gender, date, list_avg(conformities) as conformity
 from
 (
     select *
@@ -252,7 +252,7 @@ from
     WHERE percentage >= 1
     UNION ALL
     (
-        SELECT 'Other' AS gender, date, SUM(conformity_sum) AS conformity_sum, SUM(count)::int AS count, SUM(percentage) AS percentage
+        SELECT 'Other' AS gender, date, flatten(array_agg(conformities)) AS conformities, SUM(count)::int AS count, SUM(percentage) AS percentage
         FROM all_historic_accordance
         WHERE percentage < 1
         group by date
@@ -277,7 +277,8 @@ display(Plot.plot({
   marginLeft: 150,
   marginRight: 100,
   y: {
-    label: "Accordance"
+    label: "Accordance",
+    domain: [0, 5],
   },
   color: {
     legend: true,
@@ -288,7 +289,8 @@ display(Plot.plot({
     Plot.lineY(historicAccordanceFixed,
       {
         x: "date", y: "conformity", tip: true,
-        stroke: "gender"
+        stroke: "gender",
+        curve: "natural"
       }
     ),
   ]
@@ -355,24 +357,23 @@ display(studiesCompletionChart)
 
 ### Salaries by experience
 
-```sql id=studies
+```sql id=studies display
 
 
 WITH gender As (
 SELECT
   genero AS gender,
   anos_de_experiencia AS experience,
-  AVG(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS average_salary,
-  COUNT(*) AS total_count, 
-  ROUND((COUNT(*) * 1.0 / SUM(COUNT(*)) OVER ()) * 100, 3) AS percentage
+  median(ultimo_salario_mensual_o_retiro_neto_en_pesos_argentinos) AS average_salary,
+  COUNT(*) AS total_count
 FROM "db"
+where genero in ('Hombre Cis', 'Mujer Cis')
 GROUP BY genero, anos_de_experiencia
 )
 
 
 SELECT *
 FROM gender
-WHERE percentage > 1
 ORDER BY experience DESC
 
 ```
@@ -388,7 +389,7 @@ const studiesLineChart = Plot.plot({
     label: "Experience"
   },
   y: {
-    label: "Average Salary"
+    label: "Median Salary"
   },
 
   color: {
@@ -399,7 +400,7 @@ const studiesLineChart = Plot.plot({
   marks: [
     Plot.line(studies, {x: "experience", y: "average_salary", 
 stroke: "gender", curve: "natural"}),
-    Plot.dot(studies, {x: "experience", y: "average_salary", fill: "gender", r: 5, tip: true, title: d => `Average Salary: ${d.average_salary}`})
+    Plot.dot(studies, {x: "experience", y: "average_salary", fill: "gender", r: 5, tip: true, title: d => `Median Salary: ${d.average_salary}`})
   ]
 })
 
