@@ -70,7 +70,7 @@ const participantsPerPlatform = Plot.plot({
     Plot.barX(platforms, {
       y: "platform",
       x: "percentage", 
-      fill: (d) => d.platform === "Other" ? "gray" : "steelblue",
+      fill: (d) => d.platform === "Other" ? "#EFB118" : "#4269D0",
       sort: { y: "-x" },
       tip: true
     }),
@@ -147,7 +147,7 @@ const participantsPerLanguage = Plot.plot({
       Plot.barX(programming_languages, {
         y: "language",
         x: "percentage", 
-        fill: (d) => d.language === "Other" ? "gray" : "steelblue",
+        fill: (d) => d.language === "Other" ? "#EFB118" : "#4269D0",
         sort: { y: "-x" },
         tip: true
       }),
@@ -224,7 +224,7 @@ const participantsPerFramework = Plot.plot({
       Plot.barX(frameworks_tools_libraries, {
         y: "framework",
         x: "percentage", 
-        fill: (d) => d.framework === "Other" ? "gray" : "steelblue",
+        fill: (d) => d.framework === "Other" ? "#EFB118" : "#4269D0",
         sort: { y: "-x" },
         tip: true
       }),
@@ -303,7 +303,7 @@ const participantsPerDatabase = Plot.plot({
       Plot.barX(databases, {
         y: "database",
         x: "percentage", 
-        fill: (d) => d.database === "Other" ? "gray" : "steelblue",
+        fill: (d) => d.database === "Other" ? "#EFB118" : "#4269D0",
         sort: { y: "-x" },
         tip: true
       }),
@@ -379,7 +379,7 @@ const participantsPerTestingTool = Plot.plot({
       Plot.barX(qa_testing, {
         y: "testing_tool",
         x: "percentage", 
-        fill: (d) => d.testing_tool === "Other" ? "gray" : "steelblue",
+        fill: (d) => d.testing_tool === "Other" ? "#EFB118" : "#4269D0",
         sort: { y: "-x" },
         tip: true
       }),

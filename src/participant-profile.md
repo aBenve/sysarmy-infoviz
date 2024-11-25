@@ -97,7 +97,7 @@ const roleDistribution = Plot.plot({
 
   },
   marks: [
-    Plot.barX(roles, {x: "percentage", y: "role", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.role === "Other" ? "yellow" : "purple"}),
+    Plot.barX(roles, {x: "percentage", y: "role", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.role === "Other" ? "#EFB118" : "#4269D0"}),
     Plot.text(roles, {x: "percentage", y: "role", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
@@ -337,7 +337,7 @@ const careerPathsDistribution = Plot.plot({
 
   },
   marks: [
-    Plot.barX(career_paths, {x: "percentage", y: "career_path", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.career_path === "Other" ? "yellow" : "purple"}),
+    Plot.barX(career_paths, {x: "percentage", y: "career_path", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.career_path === "Other" ? "#EFB118" : "#4269D0"}),
     Plot.text(career_paths, {x: "percentage", y: "career_path", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
@@ -402,7 +402,7 @@ const universitiesDistribution = Plot.plot({
 
   },
   marks: [
-    Plot.barX(universities, {x: "percentage", y: "university", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.university === "Other" ? "yellow" : "purple"}),
+    Plot.barX(universities, {x: "percentage", y: "university", tip: true, title: d => `Total count: ${d.total_count}`, fill: (d) => d.university === "Other" ? "#EFB118" : "#4269D0"}),
     Plot.text(universities, {x: "percentage", y: "university", text: d => `${d.percentage.toFixed(2)} %`, dx: 30, textAnchor: "middle"})
   ]
 })
