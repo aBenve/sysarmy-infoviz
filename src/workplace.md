@@ -7,6 +7,12 @@ sql:
   db: ./data/2024-01.csv 
 ---
 
+```js
+var apesos = (v) => {
+    `$$${v.toFixed(2)}`
+}
+```
+
 # Workplace
 
 In this section we will analyze the data related to the workplace.

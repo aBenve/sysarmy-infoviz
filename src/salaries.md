@@ -5,6 +5,10 @@ sql:
   historic: ./data/historic.csv
 ---
 
+```js
+var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+```
+
 ### Median Salaries
 
 ```sql id=salary_per_semester
@@ -30,13 +34,18 @@ const salaryBySemester = Plot.plot({
   },
   y: {
     label: "Median Salary",
+    tickFormat: apesos,
   },
 
   marks: [
     Plot.line(salaryPerSemesterFixed, {
       x: "date", 
-      y: "mean_salary", 
-      tip: true
+      y: "mean_salary",
+      tip: {
+        format: {
+          y: apesos
+        }
+      },
     }),
   ]
 });
@@ -94,7 +103,7 @@ const salaryPerContract = Plot.plot({
 
   x: {
     label: "Salary",
-
+    tickFormat: apesos,
   },
   y: {
     label: "Contract type",
@@ -110,7 +119,11 @@ const salaryPerContract = Plot.plot({
       y: "salary_type", 
       fy: "seniority",
       fill: "seniority",
-        tip: true
+      tip: {
+        format: {
+          x: apesos
+        }
+      }
     }),
   
   ]
@@ -176,6 +189,7 @@ const salaryPerJobTitle = Plot.plot({
   },
   x: {
     label: "Median Salary",
+    tickFormat: apesos,
   },
   color: {
     legend: true,
@@ -189,9 +203,9 @@ const salaryPerJobTitle = Plot.plot({
       x: "median_salary", 
       fy: "job_title",
       fill: "seniority",
-      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x",  },
-        tip: true
+      tip: true
     }),
     Plot.axisY({ticks: []}),
   ],
@@ -245,10 +259,11 @@ const salaryPerEducationContract = Plot.plot({
   grid: true,
 
   x: {
-  label: "Salary",
+    label: "Salary",
+    tickFormat: apesos,
   },
   y: {
-  label: "Education Level",
+    label: "Education Level",
   },
 
   fy: {
@@ -261,7 +276,11 @@ const salaryPerEducationContract = Plot.plot({
     y: "education_level", 
     fy: "salary_type",
     // fill: "salary_type",
-    tip: true
+    tip: {
+      format: {
+        x: apesos
+      }
+    }
   }),
   ]
 });
@@ -313,6 +332,7 @@ const salaryPerCareerExperience = Plot.plot({
 
   x: {
     label: "Median Salary",
+    tickFormat: apesos,
   },
   y: {
     label: null
@@ -332,7 +352,7 @@ const salaryPerCareerExperience = Plot.plot({
       fy: "career",
       x: "median_salary", 
       fill: "seniority",
-      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x" },
       tip: true
     }),
@@ -389,6 +409,8 @@ const salaryPerTechnologyExperience = Plot.plot({
 
   x: {
     label: "Median Salary",
+    tickFormat: apesos,
+    ticks: 5
   },
   y: {
     label: null,
@@ -408,7 +430,7 @@ const salaryPerTechnologyExperience = Plot.plot({
       fy: "technology",
       x: "median_salary", 
       fill: "seniority",
-      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x" },
       tip: true
     }),
@@ -421,7 +443,7 @@ display(salaryPerTechnologyExperience);
 
 ### By programming languages and experience
 
-```sql id=salary_per_language_experience display
+```sql id=salary_per_language_experience
 WITH categorized_salaries AS (
   SELECT 
     seniority,
@@ -465,6 +487,7 @@ const salaryPerLanguageExperience = Plot.plot({
 
   x: {
     label: "Median Salary",
+    tickFormat: apesos,
   },
   y: {
     label: null,
@@ -484,7 +507,7 @@ const salaryPerLanguageExperience = Plot.plot({
       fy: "programming_language",
       x: "median_salary", 
       fill: "seniority",
-      title: (d) => `${d.seniority}: ${d.median_salary}`,
+      title: (d) => `${d.seniority}: ${apesos(d.median_salary)}`,
       sort: { y: "-x" },
       tip: true
     }),

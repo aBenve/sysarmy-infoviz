@@ -7,7 +7,7 @@ sql:
 
 ### By platform
 
-```sql id=platforms display
+```sql id=platforms
 
 WITH all_platforms AS (
   SELECT
@@ -58,23 +58,22 @@ const participantsPerPlatform = Plot.plot({
   marginRight: 50,
 
   x: {
-  label: "Platform",
+    label: "Percentage of participants",
   },
   y: {
-      label: "Percentage of participants",
-      grid: true,
-        domain: sortOtherToEnd.map(d => d.platform) // Use sorted order for roles
-
+    label: "Platform",
+    grid: true,
+    domain: sortOtherToEnd.map(d => d.platform) // Use sorted order for roles
   },
 
   marks: [
-      Plot.barX(platforms, {
-        y: "platform",
-        x: "percentage", 
-        fill: (d) => d.platform === "Other" ? "gray" : "steelblue",
-        sort: { y: "-x" },
-        tip: true
-      }),
+    Plot.barX(platforms, {
+      y: "platform",
+      x: "percentage", 
+      fill: (d) => d.platform === "Other" ? "gray" : "steelblue",
+      sort: { y: "-x" },
+      tip: true
+    }),
   ],
 });
 
@@ -84,7 +83,7 @@ display(participantsPerPlatform);
 
 ### By programming language
 
-```sql id=programming_languages display
+```sql id=programming_languages
 
 WITH all_languages AS (
   SELECT
@@ -136,12 +135,12 @@ const participantsPerLanguage = Plot.plot({
   marginRight: 50,
 
   x: {
-  label: "Language",
+    label: "Percentage of participants",
   },
   y: {
-      label: "Percentage of participants",
-      grid: true,
-        domain: sortOtherToEnd.map(d => d.language)
+    label: "Language",
+    grid: true,
+    domain: sortOtherToEnd.map(d => d.language)
   },
 
   marks: [
@@ -160,7 +159,7 @@ display(participantsPerLanguage);
 ```
 ### By framework, tools and libraries
 
-```sql id=frameworks_tools_libraries display
+```sql id=frameworks_tools_libraries
 
 WITH all_frameworks AS (
   SELECT
@@ -213,12 +212,12 @@ const participantsPerFramework = Plot.plot({
   marginRight: 50,
 
   x: {
-  label: "Framework",
+    label: "Percentage of participants",
   },
   y: {
-      label: "Percentage of participants",
-      grid: true,
-      domain: sortOtherToEnd.map(d => d.framework)
+    label: "Framework",
+    grid: true,
+    domain: sortOtherToEnd.map(d => d.framework)
   },
 
   marks: [
@@ -238,7 +237,7 @@ display(participantsPerFramework);
 
 ### By data bases
 
-```sql id=databases display
+```sql id=databases
 
 WITH all_databases AS (
   SELECT
@@ -292,12 +291,12 @@ const participantsPerDatabase = Plot.plot({
   marginRight: 50,
 
   x: {
-  label: "Database",
+    label: "Percentage of participants",
   },
   y: {
-      label: "Percentage of participants",
-      grid: true,
-      domain: sortOtherToEnd.map(d => d.database)
+    label: "Database",
+    grid: true,
+    domain: sortOtherToEnd.map(d => d.database)
   },
 
   marks: [
@@ -317,7 +316,7 @@ display(participantsPerDatabase);
 
 ### By Qa/Testing
 
-```sql id=qa_testing display
+```sql id=qa_testing
 
 WITH all_testing_tools AS (
   SELECT
@@ -368,10 +367,10 @@ const participantsPerTestingTool = Plot.plot({
   marginRight: 50,
 
   x: {
-  label: "Testing Tool",
+      label: "Percentage of participants",
   },
   y: {
-      label: "Percentage of participants",
+  label: "Testing Tool",
       grid: true,
       domain: sortOtherToEnd.map(d => d.testing_tool)
   },
@@ -391,7 +390,7 @@ display(participantsPerTestingTool);
 
 ```
 
-### By IA use
+### By AI use
 
 ```sql id=ia_use
 
@@ -415,7 +414,7 @@ const iaUse = Plot.plot({
     label: "Amount of participants"
   },
   y: {
-    label: "IA use"
+    label: "AI use"
   },
   
   marks: [

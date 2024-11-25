@@ -5,6 +5,10 @@ sql:
   historic: ./data/historic.csv 
 ---
 
+```js
+var apesos = (v) => `$${v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+```
+
 
 ### By Gender identity
 
@@ -54,7 +58,7 @@ display(salaryDistribution)
 
 Claramente los Hombre Cis y Mujeres Cis son la mayoria de los participantes, asi que vamos a tener en cuenta solo estos a partir de ahora.
 
-### Page gap between man and woman
+### Wage gap between man and woman
 
 ```sql id=wage_gap
 
@@ -84,7 +88,8 @@ const salaryDistribution = Plot.plot({
   marginLeft: 200,
   marginRight: 100,    
   x: {
-    label: "Amount of participants"
+    label: "Median Salary",
+    tickFormat: apesos,
   },
   y: {
     label: "Region"
@@ -102,7 +107,11 @@ const salaryDistribution = Plot.plot({
         fy: "seniority", //TODO: lo sacamos?
         fill: "seniority",
         sort: { y: "-x" },
-        tip:true
+        tip: {
+          format: {
+            x: apesos
+          }
+        }
     }),
   ]
 })
@@ -217,6 +226,7 @@ display(Plot.plot({
   marginRight: 100,
   y: {
     label: "Salary",
+    tickFormat: apesos,
   },
   color: {
     legend: true,
@@ -226,8 +236,13 @@ display(Plot.plot({
   marks: [
     Plot.lineY(historicSalariesFixed,
       {
-        x: "date", y: "salary", tip: true,
-        stroke: "gender"
+        x: "date", y: "salary",
+        stroke: "gender",
+        tip: {
+          format: {
+            y: apesos
+          }
+        },
       }
     ),
   ]
@@ -389,7 +404,8 @@ const studiesLineChart = Plot.plot({
     label: "Experience"
   },
   y: {
-    label: "Median Salary"
+    label: "Median Salary",
+    tickFormat: apesos,
   },
 
   color: {
@@ -398,9 +414,16 @@ const studiesLineChart = Plot.plot({
   },
 
   marks: [
-    Plot.line(studies, {x: "experience", y: "average_salary", 
-stroke: "gender", curve: "natural"}),
-    Plot.dot(studies, {x: "experience", y: "average_salary", fill: "gender", r: 5, tip: true, title: d => `Median Salary: ${d.average_salary}`})
+    Plot.line(studies, {x: "experience", y: "average_salary", stroke: "gender", curve: "natural"}),
+    Plot.dot(studies, {
+      x: "experience", y: "average_salary", fill: "gender", r: 5,
+      tip: {
+        format: {
+          y: apesos
+        }
+      },
+      // title: d => `Median Salary: ${d.average_salary}`
+    })
   ]
 })
 
